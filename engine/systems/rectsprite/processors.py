@@ -1,4 +1,4 @@
-from engine.esper.esper import Processor
+from engine.esper import Processor
 from engine.systems.rect.tools import get_rect
 from engine.systems.rectsprite.components import RectSpriteComponent
 

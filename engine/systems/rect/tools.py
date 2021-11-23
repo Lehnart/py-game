@@ -1,8 +1,8 @@
-from typing import Tuple, List, Optional
+from typing import Optional
 
 import pygame
 
-from engine.esper.esper import World
+from engine.esper import World
 from engine.systems.rect.components import RectComponent
 
 

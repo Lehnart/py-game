@@ -1,9 +1,8 @@
 import datetime
-from typing import List
 
 import pygame
 
-from engine.esper.esper import Processor
+from engine.esper import Processor
 from engine.systems.rectsprite.tools import get_rect_sprites
 from engine.systems.render.components import WindowComponent
 
@@ -18,15 +17,14 @@ class RenderProcessor(Processor):
 
     def process(self):
 
+        if datetime.datetime.now() - self.last_time_drawn < datetime.timedelta(seconds=1. / FRAME_PER_SECONDS):
+            return
+        self.last_time_drawn = datetime.datetime.now()
+
         for window_entity, [window_component] in self.world.get_components(WindowComponent):
             self._draw_on_window(window_component)
 
     def _draw_on_window(self, window_component: WindowComponent):
-
-        if datetime.datetime.now() - self.last_time_drawn < datetime.timedelta(seconds=1. / FRAME_PER_SECONDS):
-            return
-
-        self.last_time_drawn = datetime.datetime.now()
 
         window_surface = window_component.surface()
 

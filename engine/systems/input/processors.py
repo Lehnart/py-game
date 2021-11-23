@@ -2,9 +2,8 @@ import sys
 
 import pygame
 
-from engine.esper.esper import Processor
+from engine.esper import Processor
 from engine.systems.input.components import InputComponent
-from engine.systems.rect.events import MoveEvent
 
 
 class InputProcessor(Processor):

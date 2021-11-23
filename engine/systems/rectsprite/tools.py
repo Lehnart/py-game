@@ -2,7 +2,7 @@ from typing import Tuple, List
 
 import pygame
 
-from engine.esper.esper import World
+from engine.esper import World
 from engine.systems.rectsprite.components import RectSpriteComponent
 
 

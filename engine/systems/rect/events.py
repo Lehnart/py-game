@@ -1,4 +1,4 @@
-from engine.esper.esper import Event
+from engine.esper import Event
 
 
 class MoveEvent(Event):

@@ -1,6 +1,6 @@
 import pygame
 
-from engine.esper.esper import World
+from engine.esper import World
 from engine.systems.input.components import InputComponent
 from engine.systems.input.processors import InputProcessor
 from engine.systems.rect.components import RectComponent
@@ -20,9 +20,11 @@ class PyPong(World):
         super().__init__()
         self._is_running: bool = True
 
+        # Window entity
         window = WindowComponent((800, 840))
         self.create_entity(window)
 
+        # left paddle entity
         rect = RectComponent(5, 400, 20, 80)
         rect_sprite = RectSpriteComponent(pygame.Rect(5, 400, 20, 80), pygame.Color("white"))
         paddle1 = self.create_entity(rect, rect_sprite)
@@ -37,6 +39,7 @@ class PyPong(World):
             )
         )
 
+        # Right paddle entity
         rect = RectComponent(775, 400, 20, 80)
         rect_sprite = RectSpriteComponent(pygame.Rect(775, 400, 20, 80), pygame.Color("white"))
         paddle2 = self.create_entity(rect, rect_sprite)
@@ -49,6 +52,8 @@ class PyPong(World):
                 }
             )
         )
+
+
 
         self.add_processor(RenderProcessor(), 1)
         self.add_processor(InputProcessor(), 2)

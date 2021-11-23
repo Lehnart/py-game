@@ -1,4 +1,4 @@
-from engine.esper.esper import Processor
+from engine.esper import Processor
 from engine.systems.rect.components import RectComponent
 from engine.systems.rect.events import MoveEvent
 
