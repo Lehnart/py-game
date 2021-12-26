@@ -17,13 +17,11 @@ class InputProcessor(Processor):
 
         keys = pygame.key.get_pressed()
         for ent, input_component in input_components:
-            for key in input_component.input_dicts :
-                if keys[key] :
+            for key in input_component.input_dicts:
+                if keys[key]:
                     input_component.input_dicts[key](self.world)
-
 
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
                 sys.exit()
-
