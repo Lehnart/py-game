@@ -5,6 +5,7 @@ import pygame
 from engine.esper import Processor
 from engine.systems.rectsprite.tools import get_rect_sprites
 from engine.systems.render.components import WindowComponent
+from engine.systems.sprite.tools import get_sprites
 
 FRAME_PER_SECONDS = 60
 
@@ -31,6 +32,11 @@ class RenderProcessor(Processor):
         rect_sprites = get_rect_sprites(self.world)
         for r, c in rect_sprites:
             pygame.draw.rect(window_surface, c, pygame.Rect(r.x, r.y, r.w, r.h))
+
+
+        sprites = get_sprites(self.world)
+        for p, s in sprites:
+            window_surface.blit(s,p)
 
         pygame.display.flip()
         window_surface.fill((0, 0, 0))

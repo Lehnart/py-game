@@ -10,6 +10,7 @@ from engine.systems.rectsprite.components import RectSpriteComponent
 from engine.systems.rectsprite.processors import RectSpriteProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
+from engine.systems.sprite.components import SpriteComponent
 
 PADDLE_SPEED = 500
 
@@ -42,7 +43,7 @@ class PyPong(World):
 
         # Right paddle entity
         rect = RectComponent(775, 400, 20, 80)
-        rect_limit = RectLimitComponent(0,800,0,840)
+        rect_limit = RectLimitComponent(0, 800, 0, 840)
         rect_sprite = RectSpriteComponent(pygame.Rect(775, 400, 20, 80), pygame.Color("white"))
         paddle2 = self.create_entity(rect, rect_limit, rect_sprite)
         self.add_component(
@@ -55,6 +56,15 @@ class PyPong(World):
             )
         )
 
+        # center line
+        center_line_surf = pygame.Surface((5, 840))
+        h_segment = 10
+        y0 = 0
+        while y0 + h_segment < 840:
+            pygame.draw.rect(center_line_surf, (255, 255, 255), (0, y0, 5, h_segment))
+            y0 += 2 * h_segment
+        sprite = SpriteComponent(398,0, center_line_surf)
+        center_line = self.create_entity(sprite)
 
         self.add_processor(RenderProcessor(), 1)
         self.add_processor(InputProcessor(), 2)
