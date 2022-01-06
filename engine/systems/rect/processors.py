@@ -1,14 +1,25 @@
+import datetime
+
 from engine.esper import Processor
-from engine.systems.rect.components import RectComponent, RectLimitComponent
+from engine.systems.rect.components import RectComponent, RectLimitComponent, RectSpeedComponent
 from engine.systems.rect.events import MoveEvent
 
 
 class RectProcessor(Processor):
 
     def __init__(self):
-        pass
+        self.last_process = datetime.datetime.now()
 
     def process(self, *args, **kwargs):
+
+        dt = datetime.datetime.now() - self.last_process
+        dt_seconds = dt.total_seconds()
+        self.last_process = datetime.datetime.now()
+
+        ents = self.world.get_components(RectComponent, RectSpeedComponent)
+        for ent, [_, rect_speed_component] in ents:
+            self.world.publish(MoveEvent(ent, rect_speed_component.vx*dt_seconds, rect_speed_component.vy*dt_seconds))
+
         move_events = self.world.receive(MoveEvent)
         for move_event in move_events:
             if not self.world.entity_exists(move_event.ent):

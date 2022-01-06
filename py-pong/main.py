@@ -3,7 +3,7 @@ import pygame
 from engine.esper import World
 from engine.systems.input.components import InputComponent
 from engine.systems.input.processors import InputProcessor
-from engine.systems.rect.components import RectComponent, RectLimitComponent
+from engine.systems.rect.components import RectComponent, RectLimitComponent, RectSpeedComponent
 from engine.systems.rect.events import MoveEvent
 from engine.systems.rect.processors import RectProcessor
 from engine.systems.rectsprite.components import RectSpriteComponent
@@ -64,7 +64,14 @@ class PyPong(World):
             pygame.draw.rect(center_line_surf, (255, 255, 255), (0, y0, 5, h_segment))
             y0 += 2 * h_segment
         sprite = SpriteComponent(398,0, center_line_surf)
-        center_line = self.create_entity(sprite)
+        self.create_entity(sprite)
+
+        # ball
+        rect = RectComponent(400, 420, 10, 10)
+        rect_limit = RectLimitComponent(0, 800, 0, 840)
+        rect_speed = RectSpeedComponent(100,100)
+        rect_sprite = RectSpriteComponent(pygame.Rect(400, 420, 10, 10), pygame.Color("white"))
+        paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_speed)
 
         self.add_processor(RenderProcessor(), 1)
         self.add_processor(InputProcessor(), 2)

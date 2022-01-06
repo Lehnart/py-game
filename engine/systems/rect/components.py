@@ -11,6 +11,13 @@ class RectComponent:
         self.y += dy
 
 
+class RectSpeedComponent:
+
+    def __init__(self, vx: float, vy: float):
+        self.vx = vx
+        self.vy = vy
+
+
 class RectLimitComponent:
 
     def __init__(self, x_min: float, x_max: float, y_min: float, y_max: float):
