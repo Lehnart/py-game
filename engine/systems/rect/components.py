@@ -18,6 +18,10 @@ class RectSpeedComponent:
         self.vy = vy
 
 
+class RectBounceComponent:
+    pass
+
+
 class RectLimitComponent:
 
     def __init__(self, x_min: float, x_max: float, y_min: float, y_max: float):

@@ -1,7 +1,7 @@
 import datetime
 
 from engine.esper import Processor
-from engine.systems.rect.components import RectComponent, RectLimitComponent, RectSpeedComponent
+from engine.systems.rect.components import RectComponent, RectLimitComponent, RectSpeedComponent, RectBounceComponent
 from engine.systems.rect.events import MoveEvent
 
 
@@ -18,7 +18,8 @@ class RectProcessor(Processor):
 
         ents = self.world.get_components(RectComponent, RectSpeedComponent)
         for ent, [_, rect_speed_component] in ents:
-            self.world.publish(MoveEvent(ent, rect_speed_component.vx*dt_seconds, rect_speed_component.vy*dt_seconds))
+            self.world.publish(
+                MoveEvent(ent, rect_speed_component.vx * dt_seconds, rect_speed_component.vy * dt_seconds))
 
         move_events = self.world.receive(MoveEvent)
         for move_event in move_events:
@@ -35,6 +36,19 @@ class RectProcessor(Processor):
                 continue
 
             rect_limit = self.world.component_for_entity(move_event.ent, RectLimitComponent)
+
+            if self.world.has_components(move_event.ent, RectBounceComponent, RectSpeedComponent):
+                rect_speed = self.world.component_for_entity(move_event.ent, RectSpeedComponent)
+                vx, vy = rect_speed.vx, rect_speed.vy
+                if r.x < rect_limit.x_min and vx < 0.:
+                    rect_speed.vx *= -1
+                if r.x + r.w > rect_limit.x_max and vx > 0.:
+                    rect_speed.vx *= -1
+                if r.y < rect_limit.y_min and vy < 0.:
+                    rect_speed.vy *= -1
+                if r.y + r.h > rect_limit.y_max and vy > 0.:
+                    rect_speed.vy *= -1
+
             r.x = max(r.x, rect_limit.x_min)
             r.x = min(r.x + r.w, rect_limit.x_max) - r.w
             r.y = max(r.y, rect_limit.y_min)
