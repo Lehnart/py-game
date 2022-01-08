@@ -11,8 +11,11 @@ from engine.systems.rectsprite.processors import RectSpriteProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
 from engine.systems.sprite.components import SpriteComponent
+from engine.systems.textsprite.components import TextSpriteComponent
 
+pygame.font.init()
 PADDLE_SPEED = 500
+SCORE_FONT = pygame.font.Font("res/atari.ttf", 96)
 
 
 class PyPong(World):
@@ -63,16 +66,24 @@ class PyPong(World):
         while y0 + h_segment < 840:
             pygame.draw.rect(center_line_surf, (255, 255, 255), (0, y0, 5, h_segment))
             y0 += 2 * h_segment
-        sprite = SpriteComponent(398,0, center_line_surf)
+        sprite = SpriteComponent(398, 0, center_line_surf)
         self.create_entity(sprite)
 
         # ball
         rect = RectComponent(400, 420, 10, 10)
         rect_limit = RectLimitComponent(0, 800, 0, 840)
-        rect_speed = RectSpeedComponent(200,200)
+        rect_speed = RectSpeedComponent(200, 200)
         rect_bounce = RectBounceComponent()
         rect_sprite = RectSpriteComponent(pygame.Rect(400, 420, 10, 10), pygame.Color("white"))
         paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, rect_bounce)
+
+        # left score
+        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.color.Color(255, 255, 255), (200, 0))
+        left_score = self.create_entity(left_score_text)
+
+        # right score
+        right_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.color.Color(255, 255, 255), (600, 0))
+        right_score = self.create_entity(right_score_text)
 
         self.add_processor(RenderProcessor(), 1)
         self.add_processor(InputProcessor(), 2)
