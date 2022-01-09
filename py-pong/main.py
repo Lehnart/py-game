@@ -11,7 +11,9 @@ from engine.systems.rectsprite.processors import RectSpriteProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
 from engine.systems.sprite.components import SpriteComponent
+from engine.systems.sprite.processors import SpriteProcessor
 from engine.systems.textsprite.components import TextSpriteComponent
+from engine.systems.textsprite.processors import TextSpriteProcessor
 
 pygame.font.init()
 PADDLE_SPEED = 500
@@ -89,6 +91,8 @@ class PyPong(World):
         self.add_processor(InputProcessor(), 2)
         self.add_processor(RectProcessor(), 3)
         self.add_processor(RectSpriteProcessor(), 4)
+        self.add_processor(SpriteProcessor(), 5)
+        self.add_processor(TextSpriteProcessor(), 6)
 
     def is_running(self) -> bool:
         return self._is_running

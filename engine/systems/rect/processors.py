@@ -3,6 +3,7 @@ import datetime
 from engine.esper import Processor
 from engine.systems.rect.components import RectComponent, RectLimitComponent, RectSpeedComponent, RectBounceComponent
 from engine.systems.rect.events import MoveEvent
+from engine.systems.rectsprite.events import SetRectSpritePosEvent
 
 
 class RectProcessor(Processor):
@@ -32,24 +33,24 @@ class RectProcessor(Processor):
             r = self.world.component_for_entity(move_event.ent, RectComponent)
             r.move(move_event.dx, move_event.dy)
 
-            if not self.world.has_component(move_event.ent, RectLimitComponent):
-                continue
+            if self.world.has_component(move_event.ent, RectLimitComponent):
+                rect_limit = self.world.component_for_entity(move_event.ent, RectLimitComponent)
 
-            rect_limit = self.world.component_for_entity(move_event.ent, RectLimitComponent)
+                if self.world.has_components(move_event.ent, RectBounceComponent, RectSpeedComponent):
+                    rect_speed = self.world.component_for_entity(move_event.ent, RectSpeedComponent)
+                    vx, vy = rect_speed.vx, rect_speed.vy
+                    if r.x < rect_limit.x_min and vx < 0.:
+                        rect_speed.vx *= -1
+                    if r.x + r.w > rect_limit.x_max and vx > 0.:
+                        rect_speed.vx *= -1
+                    if r.y < rect_limit.y_min and vy < 0.:
+                        rect_speed.vy *= -1
+                    if r.y + r.h > rect_limit.y_max and vy > 0.:
+                        rect_speed.vy *= -1
 
-            if self.world.has_components(move_event.ent, RectBounceComponent, RectSpeedComponent):
-                rect_speed = self.world.component_for_entity(move_event.ent, RectSpeedComponent)
-                vx, vy = rect_speed.vx, rect_speed.vy
-                if r.x < rect_limit.x_min and vx < 0.:
-                    rect_speed.vx *= -1
-                if r.x + r.w > rect_limit.x_max and vx > 0.:
-                    rect_speed.vx *= -1
-                if r.y < rect_limit.y_min and vy < 0.:
-                    rect_speed.vy *= -1
-                if r.y + r.h > rect_limit.y_max and vy > 0.:
-                    rect_speed.vy *= -1
+                r.x = max(r.x, rect_limit.x_min)
+                r.x = min(r.x + r.w, rect_limit.x_max) - r.w
+                r.y = max(r.y, rect_limit.y_min)
+                r.y = min(r.y + r.h, rect_limit.y_max) - r.h
 
-            r.x = max(r.x, rect_limit.x_min)
-            r.x = min(r.x + r.w, rect_limit.x_max) - r.w
-            r.y = max(r.y, rect_limit.y_min)
-            r.y = min(r.y + r.h, rect_limit.y_max) - r.h
+            self.world.publish(SetRectSpritePosEvent(move_event.ent, (int(r.x), int(r.y))))

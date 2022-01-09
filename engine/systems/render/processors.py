@@ -3,10 +3,8 @@ import datetime
 import pygame
 
 from engine.esper import Processor
-from engine.systems.rectsprite.tools import get_rect_sprites
 from engine.systems.render.components import WindowComponent
-from engine.systems.sprite.tools import get_sprites
-from engine.systems.textsprite.tools import get_text_sprites
+from engine.systems.render.events import DrawRectSpriteEvent, DrawTextEvent, DrawSpriteEvent
 
 FRAME_PER_SECONDS = 60
 
@@ -30,16 +28,16 @@ class RenderProcessor(Processor):
 
         window_surface = window_component.surface()
 
-        rect_sprites = get_rect_sprites(self.world)
-        for r, c in rect_sprites:
+        for rect_sprite_event in self.world.receive(DrawRectSpriteEvent):
+            r, c = rect_sprite_event.rect, rect_sprite_event.c
             pygame.draw.rect(window_surface, c, pygame.Rect(r.x, r.y, r.w, r.h))
 
-        sprites = get_sprites(self.world)
-        for p, s in sprites:
+        for sprite_event in self.world.receive(DrawSpriteEvent):
+            s, p = sprite_event.surf, sprite_event.pos
             window_surface.blit(s, p)
 
-        text_sprites = get_text_sprites(self.world)
-        for s, ft, c, pos in text_sprites:
+        for text_event in self.world.receive(DrawTextEvent):
+            s, ft, c, pos = text_event.string, text_event.ft, text_event.c, text_event.pos
             txt_surf = ft.render(s, False, c)
             window_surface.blit(txt_surf, pos)
 
