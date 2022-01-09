@@ -1,23 +1,47 @@
 import pygame
 
-from engine.esper import World
+from engine import esper
+from engine.esper import World, Event
+from engine.systems.event.components import EventComponent
+from engine.systems.event.processors import EventProcessor
 from engine.systems.input.components import InputComponent
 from engine.systems.input.processors import InputProcessor
-from engine.systems.rect.components import RectComponent, RectLimitComponent, RectSpeedComponent, RectBounceComponent
-from engine.systems.rect.events import MoveEvent
+from engine.systems.rect.components import RectComponent, RectLimitComponent
+from engine.systems.rect.events import OutOfLimitEvent
 from engine.systems.rect.processors import RectProcessor
-from engine.systems.rectsprite.components import RectSpriteComponent
-from engine.systems.rectsprite.processors import RectSpriteProcessor
+from engine.systems.speed.components import SpeedComponent
+from engine.systems.speed.events import MoveEvent, InvertEvent
+from engine.systems.speed.processors import SpeedProcessor
+from engine.systems.sprite_rect.components import RectSpriteComponent
+from engine.systems.sprite_rect.processors import RectSpriteProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
-from engine.systems.textsprite.components import TextSpriteComponent
-from engine.systems.textsprite.processors import TextSpriteProcessor
+from engine.systems.sprite_text.components import TextSpriteComponent
+from engine.systems.sprite_text.processors import TextSpriteProcessor
 
 pygame.font.init()
 PADDLE_SPEED = 500
 SCORE_FONT = pygame.font.Font("res/atari.ttf", 96)
+
+
+def bounce(ent: int, out_of_limit_event: Event, world: esper.World):
+    out_of_limit_event: OutOfLimitEvent
+    if ent != out_of_limit_event.ent:
+        return
+
+    r = out_of_limit_event.r
+    lims = out_of_limit_event.limits
+
+    if r[0] < lims[0] :
+       world.publish(InvertEvent(ent, True,False))
+    if r[0] + r[2] > lims[1] :
+        world.publish(InvertEvent(ent, True, False))
+    if r[1] < lims[2] :
+        world.publish(InvertEvent(ent, False, True))
+    if r[1] + r[3] > lims[3] :
+        world.publish(InvertEvent(ent, False, True))
 
 
 class PyPong(World):
@@ -74,10 +98,10 @@ class PyPong(World):
         # ball
         rect = RectComponent(400, 420, 10, 10)
         rect_limit = RectLimitComponent(0, 800, 0, 840)
-        rect_speed = RectSpeedComponent(200, 200)
-        rect_bounce = RectBounceComponent()
+        rect_speed = SpeedComponent(200, 200)
         rect_sprite = RectSpriteComponent(pygame.Rect(400, 420, 10, 10), pygame.Color("white"))
-        paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, rect_bounce)
+        bounce_comp = EventComponent({OutOfLimitEvent: bounce})
+        paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, bounce_comp)
 
         # left score
         left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.color.Color(255, 255, 255), (200, 0))
@@ -93,6 +117,8 @@ class PyPong(World):
         self.add_processor(RectSpriteProcessor(), 4)
         self.add_processor(SpriteProcessor(), 5)
         self.add_processor(TextSpriteProcessor(), 6)
+        self.add_processor(EventProcessor(), 7)
+        self.add_processor(SpeedProcessor(), 8)
 
     def is_running(self) -> bool:
         return self._is_running
@@ -105,6 +131,4 @@ def run():
 
 
 if __name__ == '__main__':
-    # import cProfile
-    # cProfile.run('run()', sort="cumtime")
     run()

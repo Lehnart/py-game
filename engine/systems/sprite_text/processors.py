@@ -1,7 +1,7 @@
 from engine.esper import Processor
 from engine.systems.render.events import DrawSpriteEvent, DrawTextEvent
 from engine.systems.sprite.components import SpriteComponent
-from engine.systems.textsprite.components import TextSpriteComponent
+from engine.systems.sprite_text.components import TextSpriteComponent
 
 
 class TextSpriteProcessor(Processor):

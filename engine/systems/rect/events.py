@@ -1,10 +1,12 @@
+from typing import Tuple
+
 from engine.esper import Event
 
 
-class MoveEvent(Event):
+class OutOfLimitEvent(Event):
 
-    def __init__(self, ent: int, dx: float, dy: float):
+    def __init__(self, ent: int, r: Tuple[float, float, float, float], limits: Tuple[float, float, float, float]):
         super().__init__()
         self.ent = ent
-        self.dx = dx
-        self.dy = dy
+        self.r = r
+        self.limits = limits
