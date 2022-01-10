@@ -1,4 +1,5 @@
 from engine.esper import Processor
+from engine.systems.rect.events import HasMovedEvent
 from engine.systems.render.events import DrawRectSpriteEvent
 from engine.systems.sprite_rect.components import RectSpriteComponent
 from engine.systems.sprite_rect.events import SetRectSpritePosEvent
@@ -11,18 +12,18 @@ class RectSpriteProcessor(Processor):
 
     def process(self, *args, **kwargs):
 
-        set_pos_events = self.world.receive(SetRectSpritePosEvent)
-        for set_pos_event in set_pos_events:
+        has_moved_events = self.world.receive(HasMovedEvent)
+        for has_moved_event in has_moved_events:
 
-            if not self.world.entity_exists(set_pos_event.ent):
+            if not self.world.entity_exists(has_moved_event.ent):
                 continue
 
-            rect_sprite_comp = self.world.try_component(set_pos_event.ent, RectSpriteComponent)
+            rect_sprite_comp = self.world.try_component(has_moved_event.ent, RectSpriteComponent)
             if rect_sprite_comp is None:
                 continue
 
-            rect_sprite_comp.rect.x = set_pos_event.pos[0]
-            rect_sprite_comp.rect.y = set_pos_event.pos[1]
+            rect_sprite_comp.rect.x = has_moved_event.r[0]
+            rect_sprite_comp.rect.y = has_moved_event.r[1]
 
         rect_sprites = self.world.get_component(RectSpriteComponent)
         for rect_ent, rect_comp in rect_sprites:

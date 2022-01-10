@@ -1,12 +1,12 @@
-from typing import Tuple
+import pygame
 
 from engine.esper import Event
 
 
-class OutOfLimitEvent(Event):
+class HasMovedEvent(Event):
 
-    def __init__(self, ent: int, r: Tuple[float, float, float, float], limits: Tuple[float, float, float, float]):
+    def __init__(self, ent: int, previous_r: pygame.Rect, r: pygame.Rect):
         super().__init__()
         self.ent = ent
+        self.previous_r = previous_r
         self.r = r
-        self.limits = limits

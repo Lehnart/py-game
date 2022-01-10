@@ -6,8 +6,11 @@ from engine.systems.event.components import EventComponent
 from engine.systems.event.processors import EventProcessor
 from engine.systems.input.components import InputComponent
 from engine.systems.input.processors import InputProcessor
-from engine.systems.rect.components import RectComponent, RectLimitComponent
-from engine.systems.rect.events import OutOfLimitEvent
+from engine.systems.limit_rect.components import RectLimitComponent
+from engine.systems.limit_rect.events import OutOfLimitEvent
+from engine.systems.limit_rect.processors import LimitRectProcessor
+from engine.systems.rect.components import RectComponent
+
 from engine.systems.rect.processors import RectProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
@@ -119,6 +122,7 @@ class PyPong(World):
         self.add_processor(TextSpriteProcessor(), 6)
         self.add_processor(EventProcessor(), 7)
         self.add_processor(SpeedProcessor(), 8)
+        self.add_processor(LimitRectProcessor(), 9)
 
     def is_running(self) -> bool:
         return self._is_running

@@ -28,6 +28,7 @@ class SpeedProcessor(Processor):
 
         dt = datetime.datetime.now() - self.last_process
         dt_seconds = dt.total_seconds()
+        print(dt_seconds)
         self.last_process = datetime.datetime.now()
 
         ents = self.world.get_component(SpeedComponent)

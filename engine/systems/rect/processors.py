@@ -1,16 +1,14 @@
-import datetime
+import pygame
 
 from engine.esper import Processor
-from engine.systems.rect.components import RectComponent, RectLimitComponent
-from engine.systems.rect.events import OutOfLimitEvent
+from engine.systems.limit_rect.events import OutOfLimitEvent
+from engine.systems.rect.components import RectComponent
+from engine.systems.rect.events import HasMovedEvent
 from engine.systems.speed.events import MoveEvent
 from engine.systems.sprite_rect.events import SetRectSpritePosEvent
 
 
 class RectProcessor(Processor):
-
-    def __init__(self):
-        self.last_process = datetime.datetime.now()
 
     def process(self, *args, **kwargs):
 
@@ -23,21 +21,19 @@ class RectProcessor(Processor):
                 continue
 
             r = self.world.component_for_entity(move_event.ent, RectComponent)
+            previous_r = pygame.Rect(r.x, r.y, r.w, r.h)
             r.move(move_event.dx, move_event.dy)
+            new_r = pygame.Rect(r.x, r.y, r.w, r.h)
+            self.world.publish(HasMovedEvent(move_event.ent, previous_r, new_r))
 
-            if self.world.has_component(move_event.ent, RectLimitComponent):
-                rect_limit = self.world.component_for_entity(move_event.ent, RectLimitComponent)
-                if r.x < rect_limit.x_min or r.x + r.w > rect_limit.x_max or r.y < rect_limit.y_min or r.y + r.h > rect_limit.y_max:
-                    self.world.publish(
-                        OutOfLimitEvent(
-                            move_event.ent,
-                            (r.x, r.y, r.w, r.h),
-                            (rect_limit.x_min, rect_limit.x_max, rect_limit.y_min, rect_limit.y_max)
-                        )
-                    )
-                r.x = max(r.x, rect_limit.x_min)
-                r.x = min(r.x + r.w, rect_limit.x_max) - r.w
-                r.y = max(r.y, rect_limit.y_min)
-                r.y = min(r.y + r.h, rect_limit.y_max) - r.h
+        ool_events = self.world.receive(OutOfLimitEvent)
+        for ool_event in ool_events:
+            if not self.world.entity_exists(ool_event.ent):
+                continue
 
-            self.world.publish(SetRectSpritePosEvent(move_event.ent, (int(r.x), int(r.y))))
+            if not self.world.has_component(ool_event.ent, RectComponent):
+                continue
+
+            r = self.world.component_for_entity(ool_event.ent, RectComponent)
+            r.set_position(ool_event.cr[0], ool_event.cr[1])
+
