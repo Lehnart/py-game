@@ -1,7 +1,7 @@
 from engine.esper import Processor
+from engine.systems.render.events import DrawRectSpriteEvent
 from engine.systems.sprite_rect.components import RectSpriteComponent
 from engine.systems.sprite_rect.events import SetRectSpritePosEvent
-from engine.systems.render.events import DrawRectSpriteEvent
 
 
 class RectSpriteProcessor(Processor):

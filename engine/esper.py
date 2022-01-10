@@ -11,7 +11,6 @@ from typing import Tuple as _Tuple
 from typing import Type as _Type
 from typing import TypeVar as _TypeVar
 
-
 version = '1.5'
 
 _C = _TypeVar('_C')
@@ -76,6 +75,7 @@ class World:
     is also responsible for executing all Processors assigned to it for each
     frame of your game.
     """
+
     def __init__(self, timed=False):
         self._processors = []
         self._next_entity_id = 0

@@ -1,7 +1,5 @@
 import datetime
 
-import pygame
-
 from engine.esper import Processor
 from engine.systems.rect.components import RectComponent, RectLimitComponent
 from engine.systems.rect.events import OutOfLimitEvent
@@ -29,7 +27,7 @@ class RectProcessor(Processor):
 
             if self.world.has_component(move_event.ent, RectLimitComponent):
                 rect_limit = self.world.component_for_entity(move_event.ent, RectLimitComponent)
-                if r.x < rect_limit.x_min or r.x + r.w > rect_limit.x_max or r.y < rect_limit.y_min or r.y + r.h > rect_limit.y_max :
+                if r.x < rect_limit.x_min or r.x + r.w > rect_limit.x_max or r.y < rect_limit.y_min or r.y + r.h > rect_limit.y_max:
                     self.world.publish(
                         OutOfLimitEvent(
                             move_event.ent,
@@ -41,7 +39,5 @@ class RectProcessor(Processor):
                 r.x = min(r.x + r.w, rect_limit.x_max) - r.w
                 r.y = max(r.y, rect_limit.y_min)
                 r.y = min(r.y + r.h, rect_limit.y_max) - r.h
-
-
 
             self.world.publish(SetRectSpritePosEvent(move_event.ent, (int(r.x), int(r.y))))

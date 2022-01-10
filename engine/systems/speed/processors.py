@@ -20,7 +20,7 @@ class SpeedProcessor(Processor):
                 continue
 
             speed_component = self.world.component_for_entity(invert_event.ent, SpeedComponent)
-            if invert_event.invert_x :
+            if invert_event.invert_x:
                 speed_component.vx *= -1
 
             if invert_event.invert_y:

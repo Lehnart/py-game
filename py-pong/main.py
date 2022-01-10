@@ -9,15 +9,15 @@ from engine.systems.input.processors import InputProcessor
 from engine.systems.rect.components import RectComponent, RectLimitComponent
 from engine.systems.rect.events import OutOfLimitEvent
 from engine.systems.rect.processors import RectProcessor
+from engine.systems.render.components import WindowComponent
+from engine.systems.render.processors import RenderProcessor
 from engine.systems.speed.components import SpeedComponent
 from engine.systems.speed.events import MoveEvent, InvertEvent
 from engine.systems.speed.processors import SpeedProcessor
-from engine.systems.sprite_rect.components import RectSpriteComponent
-from engine.systems.sprite_rect.processors import RectSpriteProcessor
-from engine.systems.render.components import WindowComponent
-from engine.systems.render.processors import RenderProcessor
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
+from engine.systems.sprite_rect.components import RectSpriteComponent
+from engine.systems.sprite_rect.processors import RectSpriteProcessor
 from engine.systems.sprite_text.components import TextSpriteComponent
 from engine.systems.sprite_text.processors import TextSpriteProcessor
 
@@ -34,13 +34,13 @@ def bounce(ent: int, out_of_limit_event: Event, world: esper.World):
     r = out_of_limit_event.r
     lims = out_of_limit_event.limits
 
-    if r[0] < lims[0] :
-       world.publish(InvertEvent(ent, True,False))
-    if r[0] + r[2] > lims[1] :
+    if r[0] < lims[0]:
         world.publish(InvertEvent(ent, True, False))
-    if r[1] < lims[2] :
+    if r[0] + r[2] > lims[1]:
+        world.publish(InvertEvent(ent, True, False))
+    if r[1] < lims[2]:
         world.publish(InvertEvent(ent, False, True))
-    if r[1] + r[3] > lims[3] :
+    if r[1] + r[3] > lims[3]:
         world.publish(InvertEvent(ent, False, True))
 
 

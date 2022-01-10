@@ -1,8 +1,8 @@
 from typing import Tuple
 
-from engine.esper import Event
-
 import pygame
+
+from engine.esper import Event
 
 
 class DrawRectSpriteEvent(Event):
