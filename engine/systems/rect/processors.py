@@ -1,11 +1,12 @@
 import pygame
 
 from engine.esper import Processor
+from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.rect.components import RectComponent
 from engine.systems.rect.events import HasMovedEvent
 from engine.systems.speed.events import MoveEvent
-from engine.systems.sprite_rect.events import SetRectSpritePosEvent
+
 
 
 class RectProcessor(Processor):
@@ -36,4 +37,3 @@ class RectProcessor(Processor):
 
             r = self.world.component_for_entity(ool_event.ent, RectComponent)
             r.set_position(ool_event.cr[0], ool_event.cr[1])
-

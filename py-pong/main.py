@@ -2,6 +2,9 @@ import pygame
 
 from engine import esper
 from engine.esper import World, Event
+from engine.systems.collision_rect.components import CollisionRectComponent
+from engine.systems.collision_rect.events import RectCollisionEvent
+from engine.systems.collision_rect.processors import CollisionRectProcessor
 from engine.systems.event.components import EventComponent
 from engine.systems.event.processors import EventProcessor
 from engine.systems.input.components import InputComponent
@@ -10,7 +13,6 @@ from engine.systems.limit_rect.components import RectLimitComponent
 from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.limit_rect.processors import LimitRectProcessor
 from engine.systems.rect.components import RectComponent
-
 from engine.systems.rect.processors import RectProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
@@ -29,7 +31,21 @@ PADDLE_SPEED = 500
 SCORE_FONT = pygame.font.Font("res/atari.ttf", 96)
 
 
-def bounce(ent: int, out_of_limit_event: Event, world: esper.World):
+def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
+    collision_event: RectCollisionEvent
+    if ent != collision_event.ent1 and ent != collision_event.ent2:
+        return
+    world.publish(InvertEvent(ent, True, False))
+
+    r_ball, r_paddle = (collision_event.rect1, collision_event.rect2) if ent == collision_event.ent1 else (
+        collision_event.rect2, collision_event.rect1)
+
+    if r_paddle.x < r_ball.x:
+        world.publish(MoveEvent(ent, r_paddle.x + r_paddle.w - r_ball.x, 0))
+    else:
+        world.publish(MoveEvent(ent, r_paddle.x - (r_ball.x + r_ball.w), 0))
+
+def bounce_wall(ent: int, out_of_limit_event: Event, world: esper.World):
     out_of_limit_event: OutOfLimitEvent
     if ent != out_of_limit_event.ent:
         return
@@ -59,9 +75,10 @@ class PyPong(World):
 
         # left paddle entity
         rect = RectComponent(5, 400, 20, 80)
+        rect_collide = CollisionRectComponent(pygame.Rect(5, 400, 20, 80))
         rect_limit = RectLimitComponent(0, 800, 0, 840)
         rect_sprite = RectSpriteComponent(pygame.Rect(5, 400, 20, 80), pygame.Color("white"))
-        paddle1 = self.create_entity(rect, rect_limit, rect_sprite)
+        paddle1 = self.create_entity(rect, rect_limit, rect_sprite, rect_collide)
 
         self.add_component(
             paddle1,
@@ -75,9 +92,10 @@ class PyPong(World):
 
         # Right paddle entity
         rect = RectComponent(775, 400, 20, 80)
+        rect_collide = CollisionRectComponent(pygame.Rect(775, 400, 20, 80))
         rect_limit = RectLimitComponent(0, 800, 0, 840)
         rect_sprite = RectSpriteComponent(pygame.Rect(775, 400, 20, 80), pygame.Color("white"))
-        paddle2 = self.create_entity(rect, rect_limit, rect_sprite)
+        paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_collide)
         self.add_component(
             paddle2,
             InputComponent(
@@ -99,12 +117,13 @@ class PyPong(World):
         self.create_entity(sprite)
 
         # ball
-        rect = RectComponent(400, 420, 10, 10)
+        rect = RectComponent(380, 420, 10, 10)
+        rect_collide = CollisionRectComponent(pygame.Rect(400, 420, 10, 10))
         rect_limit = RectLimitComponent(0, 800, 0, 840)
-        rect_speed = SpeedComponent(200, 200)
+        rect_speed = SpeedComponent(-300, 300)
         rect_sprite = RectSpriteComponent(pygame.Rect(400, 420, 10, 10), pygame.Color("white"))
-        bounce_comp = EventComponent({OutOfLimitEvent: bounce})
-        paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, bounce_comp)
+        bounce_comp = EventComponent({OutOfLimitEvent: bounce_wall, RectCollisionEvent: bounce_paddle})
+        paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, rect_collide, bounce_comp)
 
         # left score
         left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.color.Color(255, 255, 255), (200, 0))
@@ -123,6 +142,7 @@ class PyPong(World):
         self.add_processor(EventProcessor(), 7)
         self.add_processor(SpeedProcessor(), 8)
         self.add_processor(LimitRectProcessor(), 9)
+        self.add_processor(CollisionRectProcessor(), 10)
 
     def is_running(self) -> bool:
         return self._is_running
