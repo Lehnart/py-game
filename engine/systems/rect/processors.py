@@ -1,17 +1,27 @@
 import pygame
 
 from engine.esper import Processor
-from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.rect.components import RectComponent
-from engine.systems.rect.events import HasMovedEvent
+from engine.systems.rect.events import HasMovedEvent, SetPositionEvent
 from engine.systems.speed.events import MoveEvent
-
 
 
 class RectProcessor(Processor):
 
     def process(self, *args, **kwargs):
+
+        set_pos_events = self.world.receive(SetPositionEvent)
+        for set_pos_event in set_pos_events:
+            if not self.world.entity_exists(set_pos_event.ent):
+                continue
+
+            if not self.world.has_component(set_pos_event.ent, RectComponent):
+                continue
+
+            r = self.world.component_for_entity(set_pos_event.ent, RectComponent)
+            r.x = set_pos_event.x
+            r.y = set_pos_event.y
 
         move_events = self.world.receive(MoveEvent)
         for move_event in move_events:
