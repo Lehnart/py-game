@@ -164,17 +164,17 @@ class PyPong(World):
             )
         )
 
-        self.add_processor(RenderProcessor(), 1)
-        self.add_processor(InputProcessor(), 2)
-        self.add_processor(RectProcessor(), 3)
-        self.add_processor(RectSpriteProcessor(), 4)
-        self.add_processor(SpriteProcessor(), 5)
-        self.add_processor(TextSpriteProcessor(), 6)
-        self.add_processor(EventProcessor(), 7)
-        self.add_processor(SpeedProcessor(), 8)
-        self.add_processor(LimitRectProcessor(), 9)
-        self.add_processor(CollisionRectProcessor(), 10)
-        self.add_processor(ScoreProcessor(), 11)
+        self.add_processor(InputProcessor(), 20)
+        self.add_processor(SpeedProcessor(), 19)
+        self.add_processor(RectProcessor(), 18)
+        self.add_processor(RectSpriteProcessor(), 17)
+        self.add_processor(SpriteProcessor(), 16)
+        self.add_processor(TextSpriteProcessor(), 15)
+        self.add_processor(LimitRectProcessor(), 13)
+        self.add_processor(CollisionRectProcessor(), 12)
+        self.add_processor(EventProcessor(), 11)
+        self.add_processor(ScoreProcessor(), 10)
+        self.add_processor(RenderProcessor(), 9)
 
     def is_running(self) -> bool:
         return self._is_running
@@ -182,10 +182,7 @@ class PyPong(World):
 
 def run():
     game_world = PyPong()
-    step = 0
     while game_world.is_running():
-        print(step)
-        step +=1
         game_world.process()
 
 

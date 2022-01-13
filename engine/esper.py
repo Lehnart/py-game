@@ -27,18 +27,18 @@ class MessageQueue:
             self._queue[key] = []
         self._queue[key].append([message, 0])
 
-    def tick(self):
+    def tick(self, n_processors):
         for key in self._queue.keys():
             for message in self._queue[key]:
                 message[1] += 1
 
         for key in self._queue.keys():
-            self._queue[key] = [msg for msg in self._queue[key] if msg[1] < 2]
+            self._queue[key] = [msg for msg in self._queue[key] if msg[1] < n_processors]
 
     def get(self, key: Type) -> List:
         if key not in self._queue:
             return []
-        return [msg[0] for msg in self._queue[key] if msg[1] == 1]
+        return [msg[0] for msg in self._queue[key]]
 
 
 class Event:
@@ -395,12 +395,12 @@ class World:
         self.clear_cache()
 
     def _process(self, *args, **kwargs):
-        self._message_queue.tick()
 
         self.process_dt = (datetime.datetime.now() - self._last_process_datetime).total_seconds()
         self._last_process_datetime = datetime.datetime.now()
 
         for processor in self._processors:
+            self._message_queue.tick(len(self._processors))
             processor.process(*args, **kwargs)
 
     def _timed_process(self, *args, **kwargs):
