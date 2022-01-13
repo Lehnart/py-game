@@ -46,4 +46,4 @@ class RectProcessor(Processor):
                 continue
 
             r = self.world.component_for_entity(ool_event.ent, RectComponent)
-            r.set_position(ool_event.cr[0], ool_event.cr[1])
+            r.move(ool_event.cr[0]-ool_event.r[0], ool_event.cr[1]-ool_event.r[1])

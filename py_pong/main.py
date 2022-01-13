@@ -20,7 +20,7 @@ from engine.systems.rect.processors import RectProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent, InvertEvent
+from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent
 from engine.systems.speed.processors import SpeedProcessor
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
@@ -54,34 +54,36 @@ class BounceWallCallback:
         lims = out_of_limit_event.limits
 
         if r[0] < lims[0]:
-            world.publish(InvertEvent(ent, True, False))
+            world.publish(SetSpeedSignEvent(ent, 1, 0))
             world.publish(IncrementScoreEvent(self.left))
             world.publish(SetPositionEvent(self.ball, *self.ball_pos))
 
         if r[0] + r[2] > lims[1]:
-            world.publish(InvertEvent(ent, True, False))
+            world.publish(SetSpeedSignEvent(ent, -1, 0))
             world.publish(IncrementScoreEvent(self.right))
             world.publish(SetPositionEvent(self.ball, *self.ball_pos))
 
         if r[1] < lims[2]:
-            world.publish(InvertEvent(ent, False, True))
+            world.publish(SetSpeedSignEvent(ent, 0, 1))
+
         if r[1] + r[3] > lims[3]:
-            world.publish(InvertEvent(ent, False, True))
+            world.publish(SetSpeedSignEvent(ent, 0, -1))
 
 
 def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
     collision_event: RectCollisionEvent
     if ent != collision_event.ent1 and ent != collision_event.ent2:
         return
-    world.publish(InvertEvent(ent, True, False))
 
     r_ball, r_paddle = (collision_event.rect1, collision_event.rect2) if ent == collision_event.ent1 else (
         collision_event.rect2, collision_event.rect1)
 
     if r_paddle.x < r_ball.x:
         world.publish(MoveEvent(ent, r_paddle.x + r_paddle.w - r_ball.x, 0))
+        world.publish(SetSpeedSignEvent(ent, 1, 0))
     else:
         world.publish(MoveEvent(ent, r_paddle.x - (r_ball.x + r_ball.w), 0))
+        world.publish(SetSpeedSignEvent(ent, -1, 0))
 
 
 class PyPong(World):

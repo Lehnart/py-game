@@ -10,10 +10,10 @@ class MoveEvent(Event):
         self.dy = dy
 
 
-class InvertEvent(Event):
+class SetSpeedSignEvent(Event):
 
-    def __init__(self, ent: int, invert_x: bool, invert_y: bool):
+    def __init__(self, ent: int, x_sign: int, y_sign: int):
         super().__init__()
         self.ent = ent
-        self.invert_x = invert_x
-        self.invert_y = invert_y
+        self.x_sign = x_sign
+        self.y_sign = y_sign
