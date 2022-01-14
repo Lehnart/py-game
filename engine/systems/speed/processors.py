@@ -31,8 +31,7 @@ class SpeedProcessor(Processor):
                 speed_component.vy = -abs(speed_component.vy)
 
         dt = datetime.datetime.now() - self.last_process
-        dt_seconds = dt.total_seconds()
-
+        dt_seconds = 0.001
         self.last_process = datetime.datetime.now()
 
         ents = self.world.get_component(SpeedComponent)
