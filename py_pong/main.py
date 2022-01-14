@@ -44,6 +44,7 @@ WALL_BOUNCE_SOUND = pygame.mixer.Sound("res/wall.wav")
 PADDLE_BOUNCE_SOUND = pygame.mixer.Sound("res/racket.wav")
 LOSE_SOUND = pygame.mixer.Sound("res/lose.wav")
 
+
 class BounceWallCallback:
 
     def __init__(self, left_score_ent: int, right_score_ent: int, ball_ent: int, ball_pos: Tuple[float, float]):
@@ -86,7 +87,8 @@ def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
     if ent != collision_event.ent1 and ent != collision_event.ent2:
         return
 
-    r_ball, r_paddle, paddle_ent = (collision_event.rect1, collision_event.rect2, collision_event.ent2) if ent == collision_event.ent1 else (
+    r_ball, r_paddle, paddle_ent = (
+    collision_event.rect1, collision_event.rect2, collision_event.ent2) if ent == collision_event.ent1 else (
         collision_event.rect2, collision_event.rect1, collision_event.ent1)
 
     if r_paddle.x < r_ball.x:

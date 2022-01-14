@@ -9,7 +9,7 @@ class OutOfLimitEvent(Event):
             self,
             ent: int,
             r: Tuple[float, float, float, float],
-            cr:[float,float,float,float],
+            cr: [float, float, float, float],
             limits: Tuple[float, float, float, float]
     ):
         super().__init__()

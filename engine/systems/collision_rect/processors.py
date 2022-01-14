@@ -27,15 +27,14 @@ class CollisionRectProcessor(Processor):
 
         current_index = 0
         for ent, cr in collision_rects:
-            collisions = cr.rect.collidelistall(rects[current_index+1:])
+            collisions = cr.rect.collidelistall(rects[current_index + 1:])
             for i in collisions:
                 self.world.publish(
                     RectCollisionEvent(
                         ent,
                         cr.rect,
-                        collision_rects[current_index+1+i][0],
-                        collision_rects[current_index+1+i][1].rect
+                        collision_rects[current_index + 1 + i][0],
+                        collision_rects[current_index + 1 + i][1].rect
                     )
                 )
             current_index += 1
-

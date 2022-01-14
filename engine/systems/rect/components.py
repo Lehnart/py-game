@@ -10,7 +10,6 @@ class RectComponent:
         self.x += dx
         self.y += dy
 
-    def set_position(self, x : float, y : float):
+    def set_position(self, x: float, y: float):
         self.x = x
         self.y = y
-
