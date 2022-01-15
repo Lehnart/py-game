@@ -4,6 +4,7 @@ from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.sound.events import PlaySoundEvent
 from engine.systems.speed.events import SetSpeedSignEvent, SetSpeedXEvent
+from py_breakout.config import BALL_SPEED
 
 
 class BounceWallCallback:
@@ -49,7 +50,7 @@ def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
     xb = r_ball.x + (r_ball.w / 2)
     xp = r_paddle.x + (r_paddle.w / 2)
     rx = (xb - xp) / r_paddle.w
-    world.publish(SetSpeedXEvent(ent, 25. * rx * 2.))
+    world.publish(SetSpeedXEvent(ent, abs(BALL_SPEED[0]) * rx * 2.))
 
     if r_paddle.y < r_ball.y:
         world.publish(SetSpeedSignEvent(ent, 0, 1))

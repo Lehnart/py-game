@@ -7,7 +7,7 @@ from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.rect.events import SetPositionEvent
 from engine.systems.sound.events import PlaySoundEvent
 from engine.systems.speed.events import SetSpeedSignEvent, SetSpeedYEvent
-from py_pong.config import BALL_RECT
+from py_pong.config import BALL_RECT, BALL_SPEED
 from py_pong.systems.score.events import IncrementScoreEvent
 
 
@@ -60,7 +60,7 @@ def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
     yb = r_ball.y + (r_ball.h / 2)
     yp = r_paddle.y + (r_paddle.h / 2)
     ry = (yb - yp) / r_paddle.h
-    world.publish(SetSpeedYEvent(ent, 25. * ry * 2.))
+    world.publish(SetSpeedYEvent(ent, abs(BALL_SPEED[1]) * ry * 2.))
 
     if r_paddle.x < r_ball.x:
         world.publish(SetSpeedSignEvent(ent, 1, 0))

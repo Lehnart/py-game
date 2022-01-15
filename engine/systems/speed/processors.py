@@ -75,12 +75,8 @@ class SpeedProcessor(Processor):
             speed_component = self.world.component_for_entity(set_x_event.ent, SpeedComponent)
             speed_component.vx = set_x_event.x
 
-
-        dt_seconds = 0.001
-        self.last_process = datetime.datetime.now()
-
         ents = self.world.get_component(SpeedComponent)
         for ent, rect_speed_component in ents:
             self.world.publish(
-                MoveEvent(ent, rect_speed_component.vx * dt_seconds, rect_speed_component.vy * dt_seconds)
+                MoveEvent(ent, rect_speed_component.vx * self.world.process_dt, rect_speed_component.vy * self.world.process_dt)
             )

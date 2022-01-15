@@ -72,6 +72,7 @@ class World:
     """A World object keeps track of all Entities, Components, and Processors.
 
     A World contains a database of all Entity/Component assignments. The World
+    A World contains a database of all Entity/Component assignments. The World
     is also responsible for executing all Processors assigned to it for each
     frame of your game.
     """
@@ -397,6 +398,7 @@ class World:
     def _process(self, *args, **kwargs):
 
         self.process_dt = (datetime.datetime.now() - self._last_process_datetime).total_seconds()
+        print(self.process_dt)
         self._last_process_datetime = datetime.datetime.now()
 
         for processor in self._processors:

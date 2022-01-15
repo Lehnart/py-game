@@ -76,7 +76,7 @@ class PyPong(World):
         )
 
         # center line
-        self.create_entity(CENTER_LINE_SPRITE)
+        self.create_entity(SpriteComponent(400,0,CENTER_LINE_SPRITE))
 
         # left score
         left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)

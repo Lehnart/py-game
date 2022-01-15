@@ -10,7 +10,15 @@ PADDLE_RECT = (360, 750, 80, 20)
 PADDLE_SPEED = 500
 
 BALL_RECT = (380, 420, 10, 10)
-BALL_SPEED = (-25,25)
+BALL_SPEED = (-400,400)
+
+BLOCKS_N_COL = 14
+BLOCKS_N_ROW = 6
+BLOCKS_Y0 = 200
+BLOCKS_H = 20
+BLOCKS_H_STEP = 5
+
+BLOCK_COLOR_PER_ROW = [pygame.Color("red"),pygame.Color("red"),pygame.Color("orange"),pygame.Color("orange"),pygame.Color("green"),pygame.Color("green"),]
 
 
 SCORE_LEFT_POS = (200,0)

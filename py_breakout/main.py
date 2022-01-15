@@ -27,7 +27,6 @@ from py_breakout.callbacks import BounceWallCallback, bounce_paddle
 from py_breakout.config import *
 
 
-
 class PyBreakout(World):
 
     def __init__(self):
@@ -37,6 +36,21 @@ class PyBreakout(World):
         # Window entity
         window = WindowComponent(WINDOW_SIZE)
         self.create_entity(window)
+
+        # Blocks
+        ww, wh = WINDOW_SIZE
+        x = 0
+        y = BLOCKS_Y0
+        for j in range(BLOCKS_N_ROW):
+            x = 0
+            for i in range(BLOCKS_N_COL):
+                rect = RectComponent(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H)
+                rect_collide = CollisionRectComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H))
+                rect_sprite = RectSpriteComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H), BLOCK_COLOR_PER_ROW[j])
+                bounce_sound = SoundComponent(BLOCK_BOUNCE_SOUND)
+                paddle1 = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound)
+                x += ww / BLOCKS_N_COL
+            y += BLOCKS_H + BLOCKS_H_STEP
 
         # paddle entity
         rect = RectComponent(*PADDLE_RECT)
@@ -56,7 +70,7 @@ class PyBreakout(World):
             )
         )
 
-        # left score
+        # score
         left_score_text = TextSpriteComponent("000", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
         left_score = self.create_entity(left_score_text)
 
