@@ -1,3 +1,5 @@
+import math
+
 from engine.esper import Event
 
 
@@ -17,3 +19,20 @@ class SetSpeedSignEvent(Event):
         self.ent = ent
         self.x_sign = x_sign
         self.y_sign = y_sign
+
+
+class SetSpeedOrientationEvent(Event):
+
+    def __init__(self, ent: int, x: float, y: float):
+        super().__init__()
+        self.ent = ent
+        self.fx = x / math.sqrt(x ** 2 + y ** 2)
+        self.fy = y / math.sqrt(x ** 2 + y ** 2)
+
+
+class SetSpeedYEvent(Event):
+
+    def __init__(self, ent: int, y: float):
+        super().__init__()
+        self.ent = ent
+        self.y = y

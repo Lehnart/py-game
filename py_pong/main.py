@@ -23,7 +23,7 @@ from engine.systems.sound.components import SoundComponent
 from engine.systems.sound.events import PlaySoundEvent
 from engine.systems.sound.processors import SoundProcessor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent
+from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent, SetSpeedYEvent
 from engine.systems.speed.processors import SpeedProcessor
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
@@ -88,8 +88,14 @@ def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
         return
 
     r_ball, r_paddle, paddle_ent = (
-    collision_event.rect1, collision_event.rect2, collision_event.ent2) if ent == collision_event.ent1 else (
-        collision_event.rect2, collision_event.rect1, collision_event.ent1)
+        collision_event.rect1, collision_event.rect2, collision_event.ent2) \
+        if ent == collision_event.ent1 \
+        else (collision_event.rect2, collision_event.rect1, collision_event.ent1)
+
+    yb = r_ball.y + (r_ball.h / 2)
+    yp = r_paddle.y + (r_paddle.h / 2)
+    ry = (yb - yp) / r_paddle.h
+    world.publish(SetSpeedYEvent(ent, 25. * ry * 2.))
 
     if r_paddle.x < r_ball.x:
         world.publish(SetSpeedSignEvent(ent, 1, 0))
