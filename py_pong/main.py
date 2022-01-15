@@ -1,9 +1,4 @@
-from typing import Tuple
-
-import pygame
-
-from engine import esper
-from engine.esper import World, Event
+from engine.esper import World
 from engine.systems.collision_rect.components import CollisionRectComponent
 from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.collision_rect.processors import CollisionRectProcessor
@@ -15,15 +10,13 @@ from engine.systems.limit_rect.components import RectLimitComponent
 from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.limit_rect.processors import LimitRectProcessor
 from engine.systems.rect.components import RectComponent
-from engine.systems.rect.events import SetPositionEvent
 from engine.systems.rect.processors import RectProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
 from engine.systems.sound.components import SoundComponent
-from engine.systems.sound.events import PlaySoundEvent
 from engine.systems.sound.processors import SoundProcessor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent, SetSpeedYEvent
+from engine.systems.speed.events import MoveEvent
 from engine.systems.speed.processors import SpeedProcessor
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
@@ -31,79 +24,10 @@ from engine.systems.sprite_rect.components import RectSpriteComponent
 from engine.systems.sprite_rect.processors import RectSpriteProcessor
 from engine.systems.sprite_text.components import TextSpriteComponent
 from engine.systems.sprite_text.processors import TextSpriteProcessor
+from py_pong.callbacks import BounceWallCallback, bounce_paddle
+from py_pong.config import *
 from py_pong.systems.score.components import ScoreComponent
-from py_pong.systems.score.events import IncrementScoreEvent
 from py_pong.systems.score.processors import ScoreProcessor
-
-pygame.font.init()
-pygame.mixer.init()
-
-PADDLE_SPEED = 500
-SCORE_FONT = pygame.font.Font("res/atari.ttf", 96)
-WALL_BOUNCE_SOUND = pygame.mixer.Sound("res/wall.wav")
-PADDLE_BOUNCE_SOUND = pygame.mixer.Sound("res/racket.wav")
-LOSE_SOUND = pygame.mixer.Sound("res/lose.wav")
-
-
-class BounceWallCallback:
-
-    def __init__(self, left_score_ent: int, right_score_ent: int, ball_ent: int, ball_pos: Tuple[float, float]):
-        self.left = left_score_ent
-        self.right = right_score_ent
-        self.ball = ball_ent
-        self.ball_pos = ball_pos
-
-    def __call__(self, ent: int, out_of_limit_event: Event, world: esper.World):
-        out_of_limit_event: OutOfLimitEvent
-        if ent != out_of_limit_event.ent:
-            return
-
-        r = out_of_limit_event.r
-        lims = out_of_limit_event.limits
-
-        if r[0] < lims[0]:
-            world.publish(SetSpeedSignEvent(ent, 1, 0))
-            world.publish(IncrementScoreEvent(self.left))
-            world.publish(PlaySoundEvent(self.left))
-            world.publish(SetPositionEvent(self.ball, *self.ball_pos))
-
-        if r[0] + r[2] > lims[1]:
-            world.publish(SetSpeedSignEvent(ent, -1, 0))
-            world.publish(IncrementScoreEvent(self.right))
-            world.publish(PlaySoundEvent(self.right))
-            world.publish(SetPositionEvent(self.ball, *self.ball_pos))
-
-        if r[1] < lims[2]:
-            world.publish(SetSpeedSignEvent(ent, 0, 1))
-            world.publish(PlaySoundEvent(ent))
-
-        if r[1] + r[3] > lims[3]:
-            world.publish(SetSpeedSignEvent(ent, 0, -1))
-            world.publish(PlaySoundEvent(ent))
-
-
-def bounce_paddle(ent: int, collision_event: Event, world: esper.World):
-    collision_event: RectCollisionEvent
-    if ent != collision_event.ent1 and ent != collision_event.ent2:
-        return
-
-    r_ball, r_paddle, paddle_ent = (
-        collision_event.rect1, collision_event.rect2, collision_event.ent2) \
-        if ent == collision_event.ent1 \
-        else (collision_event.rect2, collision_event.rect1, collision_event.ent1)
-
-    yb = r_ball.y + (r_ball.h / 2)
-    yp = r_paddle.y + (r_paddle.h / 2)
-    ry = (yb - yp) / r_paddle.h
-    world.publish(SetSpeedYEvent(ent, 25. * ry * 2.))
-
-    if r_paddle.x < r_ball.x:
-        world.publish(SetSpeedSignEvent(ent, 1, 0))
-        world.publish(PlaySoundEvent(paddle_ent))
-    else:
-        world.publish(SetSpeedSignEvent(ent, -1, 0))
-        world.publish(PlaySoundEvent(paddle_ent))
-
 
 class PyPong(World):
 
@@ -112,14 +36,14 @@ class PyPong(World):
         self._is_running: bool = True
 
         # Window entity
-        window = WindowComponent((800, 840))
+        window = WindowComponent(WINDOW_SIZE)
         self.create_entity(window)
 
         # left paddle entity
-        rect = RectComponent(5, 400, 20, 80)
-        rect_collide = CollisionRectComponent(pygame.Rect(5, 400, 20, 80))
-        rect_limit = RectLimitComponent(0, 800, 0, 840)
-        rect_sprite = RectSpriteComponent(pygame.Rect(5, 400, 20, 80), pygame.Color("white"))
+        rect = RectComponent(*PADDLE_LEFT_RECT)
+        rect_collide = CollisionRectComponent(pygame.Rect(*PADDLE_LEFT_RECT))
+        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
+        rect_sprite = RectSpriteComponent(pygame.Rect(*PADDLE_LEFT_RECT), pygame.Color("white"))
         bounce_sound = SoundComponent(PADDLE_BOUNCE_SOUND)
         paddle1 = self.create_entity(rect, rect_limit, rect_sprite, rect_collide, bounce_sound)
 
@@ -134,10 +58,10 @@ class PyPong(World):
         )
 
         # Right paddle entity
-        rect = RectComponent(775, 400, 20, 80)
-        rect_collide = CollisionRectComponent(pygame.Rect(775, 400, 20, 80))
-        rect_limit = RectLimitComponent(0, 800, 0, 840)
-        rect_sprite = RectSpriteComponent(pygame.Rect(775, 400, 20, 80), pygame.Color("white"))
+        rect = RectComponent(*PADDLE_RIGHT_RECT)
+        rect_collide = CollisionRectComponent(pygame.Rect(*PADDLE_RIGHT_RECT))
+        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
+        rect_sprite = RectSpriteComponent(pygame.Rect(*PADDLE_RIGHT_RECT), pygame.Color("white"))
         bounce_sound = SoundComponent(PADDLE_BOUNCE_SOUND)
         paddle2 = self.create_entity(rect, rect_limit, rect_sprite, rect_collide, bounce_sound)
 
@@ -152,40 +76,33 @@ class PyPong(World):
         )
 
         # center line
-        center_line_surf = pygame.Surface((5, 840))
-        h_segment = 10
-        y0 = 0
-        while y0 + h_segment < 840:
-            pygame.draw.rect(center_line_surf, (255, 255, 255), (0, y0, 5, h_segment))
-            y0 += 2 * h_segment
-        sprite = SpriteComponent(398, 0, center_line_surf)
-        self.create_entity(sprite)
+        self.create_entity(CENTER_LINE_SPRITE)
 
         # left score
-        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.color.Color(255, 255, 255), (200, 0))
+        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
         left_score_comp = ScoreComponent(0)
         sound_comp = SoundComponent(LOSE_SOUND)
         left_score = self.create_entity(left_score_text, left_score_comp, sound_comp)
 
         # right score
-        right_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.color.Color(255, 255, 255), (600, 0))
+        right_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_RIGHT_POS)
         right_score_comp = ScoreComponent(0)
         sound_comp = SoundComponent(LOSE_SOUND)
         right_score = self.create_entity(right_score_text, right_score_comp, sound_comp)
 
         # ball
-        rect = RectComponent(380, 420, 10, 10)
-        rect_collide = CollisionRectComponent(pygame.Rect(400, 420, 10, 10))
-        rect_limit = RectLimitComponent(0, 800, 0, 840)
-        rect_speed = SpeedComponent(-25, 25)
-        rect_sprite = RectSpriteComponent(pygame.Rect(400, 420, 10, 10), pygame.Color("white"))
+        rect = RectComponent(*BALL_RECT)
+        rect_collide = CollisionRectComponent(pygame.Rect(*BALL_RECT))
+        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
+        rect_speed = SpeedComponent(*BALL_SPEED)
+        rect_sprite = RectSpriteComponent(pygame.Rect(*BALL_RECT), pygame.Color("white"))
         bounce_sound = SoundComponent(WALL_BOUNCE_SOUND)
         ball = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, rect_collide, bounce_sound)
         self.add_component(
             ball,
             EventComponent(
                 {
-                    OutOfLimitEvent: BounceWallCallback(left_score, right_score, ball, (380, 420)),
+                    OutOfLimitEvent: BounceWallCallback(left_score, right_score, ball),
                     RectCollisionEvent: bounce_paddle
                 }
             )
