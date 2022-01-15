@@ -3,7 +3,8 @@ import math
 
 from engine.esper import Processor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent, SetSpeedOrientationEvent, SetSpeedYEvent
+from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent, SetSpeedOrientationEvent, SetSpeedYEvent, \
+    SetSpeedXEvent
 
 
 class SpeedProcessor(Processor):
@@ -62,6 +63,18 @@ class SpeedProcessor(Processor):
 
             speed_component = self.world.component_for_entity(set_y_event.ent, SpeedComponent)
             speed_component.vy = set_y_event.y
+
+        set_x_events = self.world.receive(SetSpeedXEvent)
+        for set_x_event in set_x_events:
+            if not self.world.entity_exists(set_x_event.ent):
+                continue
+
+            if not self.world.has_component(set_x_event.ent, SpeedComponent):
+                continue
+
+            speed_component = self.world.component_for_entity(set_x_event.ent, SpeedComponent)
+            speed_component.vx = set_x_event.x
+
 
         dt_seconds = 0.001
         self.last_process = datetime.datetime.now()

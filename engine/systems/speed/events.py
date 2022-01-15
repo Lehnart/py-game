@@ -36,3 +36,11 @@ class SetSpeedYEvent(Event):
         super().__init__()
         self.ent = ent
         self.y = y
+
+
+class SetSpeedXEvent(Event):
+
+    def __init__(self, ent: int, x: float):
+        super().__init__()
+        self.ent = ent
+        self.x = x
