@@ -398,7 +398,6 @@ class World:
     def _process(self, *args, **kwargs):
 
         self.process_dt = (datetime.datetime.now() - self._last_process_datetime).total_seconds()
-        print(self.process_dt)
         self._last_process_datetime = datetime.datetime.now()
 
         for processor in self._processors:

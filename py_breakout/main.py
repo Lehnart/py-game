@@ -2,6 +2,8 @@ from engine.esper import World
 from engine.systems.collision_rect.components import CollisionRectComponent
 from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.collision_rect.processors import CollisionRectProcessor
+from engine.systems.destroyable.components import DestroyableComponent
+from engine.systems.destroyable.processors import DestroyableProcessor
 from engine.systems.event.components import EventComponent
 from engine.systems.event.processors import EventProcessor
 from engine.systems.input.components import InputComponent
@@ -23,7 +25,7 @@ from engine.systems.sprite_rect.components import RectSpriteComponent
 from engine.systems.sprite_rect.processors import RectSpriteProcessor
 from engine.systems.sprite_text.components import TextSpriteComponent
 from engine.systems.sprite_text.processors import TextSpriteProcessor
-from py_breakout.callbacks import BounceWallCallback, bounce_paddle
+from py_breakout.callbacks import BounceWallCallback, BounceRectCallback
 from py_breakout.config import *
 
 
@@ -48,7 +50,7 @@ class PyBreakout(World):
                 rect_collide = CollisionRectComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H))
                 rect_sprite = RectSpriteComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H), BLOCK_COLOR_PER_ROW[j])
                 bounce_sound = SoundComponent(BLOCK_BOUNCE_SOUND)
-                paddle1 = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound)
+                block = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound, DestroyableComponent())
                 x += ww / BLOCKS_N_COL
             y += BLOCKS_H + BLOCKS_H_STEP
 
@@ -74,6 +76,11 @@ class PyBreakout(World):
         left_score_text = TextSpriteComponent("000", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
         left_score = self.create_entity(left_score_text)
 
+        # lives
+        lives_text = TextSpriteComponent("003", SCORE_FONT, pygame.Color("white"), LIVE_POS)
+        lives = self.create_entity(lives_text)
+
+
         # ball
         rect = RectComponent(*BALL_RECT)
         rect_collide = CollisionRectComponent(pygame.Rect(*BALL_RECT))
@@ -87,7 +94,7 @@ class PyBreakout(World):
             EventComponent(
                 {
                     OutOfLimitEvent: BounceWallCallback(ball),
-                    RectCollisionEvent: bounce_paddle
+                    RectCollisionEvent: BounceRectCallback(ball, paddle1)
                 }
             )
         )
@@ -103,6 +110,7 @@ class PyBreakout(World):
         self.add_processor(EventProcessor(), 11)
         self.add_processor(RenderProcessor(), 9)
         self.add_processor(SoundProcessor(), 8)
+        self.add_processor(DestroyableProcessor(), 7)
 
     def is_running(self) -> bool:
         return self._is_running

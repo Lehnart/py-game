@@ -21,7 +21,10 @@ BLOCKS_H_STEP = 5
 BLOCK_COLOR_PER_ROW = [pygame.Color("red"),pygame.Color("red"),pygame.Color("orange"),pygame.Color("orange"),pygame.Color("green"),pygame.Color("green"),]
 
 
-SCORE_LEFT_POS = (200,0)
+LIVE_POS = (100,0)
+LIVE_FONT = pygame.font.Font("res/atari.ttf", 96)
+
+SCORE_LEFT_POS = (100,75)
 SCORE_FONT = pygame.font.Font("res/atari.ttf", 96)
 
 WALL_BOUNCE_SOUND = pygame.mixer.Sound("res/wall.wav")
