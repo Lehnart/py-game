@@ -1,18 +1,23 @@
+from typing import Tuple
+
 from engine import esper
 from engine.esper import Event
 from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.destroyable.events import DestroyEvent
 from engine.systems.limit_rect.events import OutOfLimitEvent
+from engine.systems.rect.events import SetPositionEvent
 from engine.systems.sound.events import PlaySoundEvent
 from engine.systems.speed.events import SetSpeedSignEvent, SetSpeedXEvent
 from py_breakout.config import BALL_SPEED
+from py_breakout.systems.life.events import DecreaseLifeEvent
 from py_breakout.systems.score_value.events import SendScoreValueEvent
 
 
 class BounceWallCallback:
 
-    def __init__(self, ball_ent: int):
+    def __init__(self, ball_ent: int, ball_start_pos: Tuple[float,float]):
         self.ball = ball_ent
+        self.ball_pos = ball_start_pos
 
     def __call__(self, ent: int, out_of_limit_event: Event, world: esper.World):
         out_of_limit_event: OutOfLimitEvent
@@ -35,8 +40,8 @@ class BounceWallCallback:
             world.publish(PlaySoundEvent(self.ball))
 
         if r[1] + r[3] > lims[3]:
-            world.publish(SetSpeedSignEvent(ent, 0, -1))
-            world.publish(PlaySoundEvent(self.ball))
+            world.publish(SetPositionEvent(ent, *self.ball_pos))
+            world.publish(DecreaseLifeEvent())
 
 
 class BounceRectCallback:

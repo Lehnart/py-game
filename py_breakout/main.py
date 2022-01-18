@@ -27,6 +27,8 @@ from engine.systems.sprite_text.components import TextSpriteComponent
 from engine.systems.sprite_text.processors import TextSpriteProcessor
 from py_breakout.callbacks import BounceWallCallback, BounceRectCallback
 from py_breakout.config import *
+from py_breakout.systems.life.components import LifeComponent
+from py_breakout.systems.life.processors import LifeProcessor
 from py_breakout.systems.score.components import ScoreComponent
 from py_breakout.systems.score.processors import ScoreProcessor
 from py_breakout.systems.score_value.components import ScoreValueComponent
@@ -86,7 +88,8 @@ class PyBreakout(World):
 
         # lives
         lives_text = TextSpriteComponent("3", SCORE_FONT, pygame.Color("white"), LIVE_POS)
-        lives = self.create_entity(lives_text)
+        life = LifeComponent(3)
+        lives = self.create_entity(lives_text, life)
 
         # ball
         rect = RectComponent(*BALL_RECT)
@@ -100,7 +103,7 @@ class PyBreakout(World):
             ball,
             EventComponent(
                 {
-                    OutOfLimitEvent: BounceWallCallback(ball),
+                    OutOfLimitEvent: BounceWallCallback(ball, BALL_RECT[:2]),
                     RectCollisionEvent: BounceRectCallback(ball, paddle1)
                 }
             )
@@ -119,6 +122,7 @@ class PyBreakout(World):
         self.add_processor(SoundProcessor(), 8)
         self.add_processor(ScoreValueProcessor(), 7)
         self.add_processor(ScoreProcessor(), 6)
+        self.add_processor(LifeProcessor(), 5)
 
         self.add_processor(DestroyableProcessor(), 0)
 
