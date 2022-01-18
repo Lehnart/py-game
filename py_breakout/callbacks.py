@@ -6,6 +6,7 @@ from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.sound.events import PlaySoundEvent
 from engine.systems.speed.events import SetSpeedSignEvent, SetSpeedXEvent
 from py_breakout.config import BALL_SPEED
+from py_breakout.systems.score_value.events import SendScoreValueEvent
 
 
 class BounceWallCallback:
@@ -62,6 +63,7 @@ class BounceRectCallback:
 
         world.publish(PlaySoundEvent(rect_ent))
         world.publish(DestroyEvent(rect_ent))
+        world.publish(SendScoreValueEvent(rect_ent))
 
         if r_paddle.y < r_ball.y:
             world.publish(SetSpeedSignEvent(ent, 0, 1))

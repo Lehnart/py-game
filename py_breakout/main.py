@@ -27,6 +27,10 @@ from engine.systems.sprite_text.components import TextSpriteComponent
 from engine.systems.sprite_text.processors import TextSpriteProcessor
 from py_breakout.callbacks import BounceWallCallback, BounceRectCallback
 from py_breakout.config import *
+from py_breakout.systems.score.components import ScoreComponent
+from py_breakout.systems.score.processors import ScoreProcessor
+from py_breakout.systems.score_value.components import ScoreValueComponent
+from py_breakout.systems.score_value.processors import ScoreValueProcessor
 
 
 class PyBreakout(World):
@@ -48,9 +52,12 @@ class PyBreakout(World):
             for i in range(BLOCKS_N_COL):
                 rect = RectComponent(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H)
                 rect_collide = CollisionRectComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H))
-                rect_sprite = RectSpriteComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H), BLOCK_COLOR_PER_ROW[j])
+                rect_sprite = RectSpriteComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H),
+                                                  BLOCK_COLOR_PER_ROW[j])
+                score_value = ScoreValueComponent(BLOCK_SCORE_VALUE_PER_ROW[j])
+
                 bounce_sound = SoundComponent(BLOCK_BOUNCE_SOUND)
-                block = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound, DestroyableComponent())
+                block = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound, DestroyableComponent(), score_value)
                 x += ww / BLOCKS_N_COL
             y += BLOCKS_H + BLOCKS_H_STEP
 
@@ -73,13 +80,13 @@ class PyBreakout(World):
         )
 
         # score
-        left_score_text = TextSpriteComponent("000", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
-        left_score = self.create_entity(left_score_text)
+        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
+        score_comp = ScoreComponent(0)
+        left_score = self.create_entity(left_score_text, score_comp)
 
         # lives
-        lives_text = TextSpriteComponent("003", SCORE_FONT, pygame.Color("white"), LIVE_POS)
+        lives_text = TextSpriteComponent("3", SCORE_FONT, pygame.Color("white"), LIVE_POS)
         lives = self.create_entity(lives_text)
-
 
         # ball
         rect = RectComponent(*BALL_RECT)
@@ -110,7 +117,10 @@ class PyBreakout(World):
         self.add_processor(EventProcessor(), 11)
         self.add_processor(RenderProcessor(), 9)
         self.add_processor(SoundProcessor(), 8)
-        self.add_processor(DestroyableProcessor(), 7)
+        self.add_processor(ScoreValueProcessor(), 7)
+        self.add_processor(ScoreProcessor(), 6)
+
+        self.add_processor(DestroyableProcessor(), 0)
 
     def is_running(self) -> bool:
         return self._is_running
