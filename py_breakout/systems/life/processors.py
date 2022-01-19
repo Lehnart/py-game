@@ -1,7 +1,7 @@
 from engine.esper import Processor
 from engine.systems.sprite_text.events import SetTextEvent
 from py_breakout.systems.life.components import LifeComponent
-from py_breakout.systems.life.events import DecreaseLifeEvent
+from py_breakout.systems.life.events import DecreaseLifeEvent, NewLifeValueEvent
 
 
 class LifeProcessor(Processor):
@@ -16,3 +16,4 @@ class LifeProcessor(Processor):
             for ent, life_comp in life_comps:
                 life_comp.life -= 1
                 self.world.publish(SetTextEvent(ent, str(life_comp.life)))
+                self.world.publish(NewLifeValueEvent(life_comp.life))

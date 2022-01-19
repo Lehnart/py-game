@@ -1,4 +1,4 @@
-from engine.esper import World
+from engine.esper import World, Event
 from engine.systems.collision_rect.components import CollisionRectComponent
 from engine.systems.collision_rect.events import RectCollisionEvent
 from engine.systems.collision_rect.processors import CollisionRectProcessor
@@ -28,12 +28,18 @@ from engine.systems.sprite_text.processors import TextSpriteProcessor
 from py_breakout.callbacks import BounceWallCallback, BounceRectCallback
 from py_breakout.config import *
 from py_breakout.systems.life.components import LifeComponent
+from py_breakout.systems.life.events import NewLifeValueEvent
 from py_breakout.systems.life.processors import LifeProcessor
 from py_breakout.systems.score.components import ScoreComponent
 from py_breakout.systems.score.processors import ScoreProcessor
 from py_breakout.systems.score_value.components import ScoreValueComponent
 from py_breakout.systems.score_value.processors import ScoreValueProcessor
 
+def reset(ent:int, event:Event, world:World):
+    event : NewLifeValueEvent
+    if event.life_value == 0 :
+        world.delete_entities()
+        world.init_entities()
 
 class PyBreakout(World):
 
@@ -43,71 +49,13 @@ class PyBreakout(World):
 
         # Window entity
         window = WindowComponent(WINDOW_SIZE)
-        self.create_entity(window)
-
-        # Blocks
-        ww, wh = WINDOW_SIZE
-        x = 0
-        y = BLOCKS_Y0
-        for j in range(BLOCKS_N_ROW):
-            x = 0
-            for i in range(BLOCKS_N_COL):
-                rect = RectComponent(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H)
-                rect_collide = CollisionRectComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H))
-                rect_sprite = RectSpriteComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H),
-                                                  BLOCK_COLOR_PER_ROW[j])
-                score_value = ScoreValueComponent(BLOCK_SCORE_VALUE_PER_ROW[j])
-
-                bounce_sound = SoundComponent(BLOCK_BOUNCE_SOUND)
-                block = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound, DestroyableComponent(), score_value)
-                x += ww / BLOCKS_N_COL
-            y += BLOCKS_H + BLOCKS_H_STEP
-
-        # paddle entity
-        rect = RectComponent(*PADDLE_RECT)
-        rect_collide = CollisionRectComponent(pygame.Rect(*PADDLE_RECT))
-        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
-        rect_sprite = RectSpriteComponent(pygame.Rect(*PADDLE_RECT), pygame.Color("white"))
-        bounce_sound = SoundComponent(PADDLE_BOUNCE_SOUND)
-        paddle1 = self.create_entity(rect, rect_limit, rect_sprite, rect_collide, bounce_sound)
-
-        self.add_component(
-            paddle1,
-            InputComponent(
-                {
-                    pygame.K_LEFT: lambda w: w.publish(MoveEvent(paddle1, -w.process_dt * PADDLE_SPEED, 0.)),
-                    pygame.K_RIGHT: lambda w: w.publish(MoveEvent(paddle1, +w.process_dt * PADDLE_SPEED, 0.)),
-                }
-            )
+        reset_comp = EventComponent(
+            {
+                NewLifeValueEvent:reset,
+            }
         )
-
-        # score
-        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
-        score_comp = ScoreComponent(0)
-        left_score = self.create_entity(left_score_text, score_comp)
-
-        # lives
-        lives_text = TextSpriteComponent("3", SCORE_FONT, pygame.Color("white"), LIVE_POS)
-        life = LifeComponent(3)
-        lives = self.create_entity(lives_text, life)
-
-        # ball
-        rect = RectComponent(*BALL_RECT)
-        rect_collide = CollisionRectComponent(pygame.Rect(*BALL_RECT))
-        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
-        rect_speed = SpeedComponent(*BALL_SPEED)
-        rect_sprite = RectSpriteComponent(pygame.Rect(*BALL_RECT), pygame.Color("white"))
-        bounce_sound = SoundComponent(WALL_BOUNCE_SOUND)
-        ball = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, rect_collide, bounce_sound)
-        self.add_component(
-            ball,
-            EventComponent(
-                {
-                    OutOfLimitEvent: BounceWallCallback(ball, BALL_RECT[:2]),
-                    RectCollisionEvent: BounceRectCallback(ball, paddle1)
-                }
-            )
-        )
+        self.create_entity(window, reset_comp)
+        self.init_entities()
 
         self.add_processor(InputProcessor(), 20)
         self.add_processor(SpeedProcessor(), 19)
@@ -125,6 +73,84 @@ class PyBreakout(World):
         self.add_processor(LifeProcessor(), 5)
 
         self.add_processor(DestroyableProcessor(), 0)
+
+    def delete_entities(self):
+        for block in self.blocks:
+            if self.entity_exists(block) :
+                self.delete_entity(block, True)
+
+        self.delete_entity(self.paddle, True)
+        self.delete_entity(self.lives, True)
+        self.delete_entity(self.ball, True)
+        self.delete_entity(self.score, True)
+
+    def init_entities(self):
+
+        # Blocks
+        self.blocks = []
+        ww, wh = WINDOW_SIZE
+        y = BLOCKS_Y0
+        for j in range(BLOCKS_N_ROW):
+            x = 0
+            for i in range(BLOCKS_N_COL):
+                rect = RectComponent(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H)
+                rect_collide = CollisionRectComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H))
+                rect_sprite = RectSpriteComponent(pygame.Rect(x, y, ww / BLOCKS_N_COL * 0.9, BLOCKS_H),
+                                                  BLOCK_COLOR_PER_ROW[j])
+                score_value = ScoreValueComponent(BLOCK_SCORE_VALUE_PER_ROW[j])
+
+                bounce_sound = SoundComponent(BLOCK_BOUNCE_SOUND)
+                block = self.create_entity(rect, rect_sprite, rect_collide, bounce_sound, DestroyableComponent(),
+                                           score_value)
+                self.blocks.append(block)
+                x += ww / BLOCKS_N_COL
+            y += BLOCKS_H + BLOCKS_H_STEP
+
+        # paddle entity
+        rect = RectComponent(*PADDLE_RECT)
+        rect_collide = CollisionRectComponent(pygame.Rect(*PADDLE_RECT))
+        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
+        rect_sprite = RectSpriteComponent(pygame.Rect(*PADDLE_RECT), pygame.Color("white"))
+        bounce_sound = SoundComponent(PADDLE_BOUNCE_SOUND)
+        self.paddle = self.create_entity(rect, rect_limit, rect_sprite, rect_collide, bounce_sound)
+
+        self.add_component(
+            self.paddle,
+            InputComponent(
+                {
+                    pygame.K_LEFT: lambda w: w.publish(MoveEvent(self.paddle, -w.process_dt * PADDLE_SPEED, 0.)),
+                    pygame.K_RIGHT: lambda w: w.publish(MoveEvent(self.paddle, +w.process_dt * PADDLE_SPEED, 0.)),
+                }
+            )
+        )
+
+        # score
+        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
+        score_comp = ScoreComponent(0)
+        self.score = self.create_entity(left_score_text, score_comp)
+
+        # lives
+        lives_text = TextSpriteComponent("3", SCORE_FONT, pygame.Color("white"), LIVE_POS)
+        life = LifeComponent(3)
+        self.lives = self.create_entity(lives_text, life)
+
+        # ball
+        rect = RectComponent(*BALL_RECT)
+        rect_collide = CollisionRectComponent(pygame.Rect(*BALL_RECT))
+        rect_limit = RectLimitComponent(*WINDOW_LIMITS)
+        rect_speed = SpeedComponent(*BALL_SPEED)
+        rect_sprite = RectSpriteComponent(pygame.Rect(*BALL_RECT), pygame.Color("white"))
+        bounce_sound = SoundComponent(WALL_BOUNCE_SOUND)
+        self.ball = self.create_entity(rect, rect_limit, rect_sprite, rect_speed, rect_collide, bounce_sound)
+        self.add_component(
+            self.ball,
+            EventComponent(
+                {
+                    OutOfLimitEvent: BounceWallCallback(self.ball, BALL_RECT[:2]),
+                    RectCollisionEvent: BounceRectCallback(self.ball, self.paddle)
+                }
+            )
+        )
 
     def is_running(self) -> bool:
         return self._is_running
