@@ -118,7 +118,7 @@ class PyPong(World):
         self.add_processor(CollisionRectProcessor(), 12)
         self.add_processor(EventProcessor(), 11)
         self.add_processor(ScoreProcessor(), 10)
-        self.add_processor(RenderProcessor(), 9)
+        self.add_processor(RenderProcessor(FRAME_RATE), 9)
         self.add_processor(SoundProcessor(), 8)
 
     def is_running(self) -> bool:

@@ -6,6 +6,8 @@ pygame.mixer.init()
 WINDOW_SIZE = (800, 840)
 WINDOW_LIMITS = (0, 800, 0, 840)
 
+FRAME_RATE = 60
+
 PADDLE_RECT = (360, 750, 80, 20)
 PADDLE_SPEED = 500
 

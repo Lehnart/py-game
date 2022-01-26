@@ -66,7 +66,7 @@ class PyBreakout(World):
         self.add_processor(LimitRectProcessor(), 13)
         self.add_processor(CollisionRectProcessor(), 12)
         self.add_processor(EventProcessor(), 11)
-        self.add_processor(RenderProcessor(), 9)
+        self.add_processor(RenderProcessor(FRAME_RATE), 9)
         self.add_processor(SoundProcessor(), 8)
         self.add_processor(ScoreValueProcessor(), 7)
         self.add_processor(ScoreProcessor(), 6)

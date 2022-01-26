@@ -1,3 +1,5 @@
+import datetime
+
 import pygame.transform
 
 from engine.esper import Processor
@@ -9,10 +11,12 @@ from engine.systems.sprite.components import SpriteComponent
 
 class SpriteProcessor(Processor):
 
-    def __init__(self):
+    def __init__(self, frame_per_seconds: float = 60):
         super().__init__()
+        self.frame_per_seconds = frame_per_seconds
 
     def process(self):
+
         has_moved_events = self.world.receive(HasMovedEvent)
         for has_moved_event in has_moved_events:
 
@@ -37,7 +41,7 @@ class SpriteProcessor(Processor):
                 continue
 
             print(has_rotated_event.orientation_angle)
-            sprite_comp.sprite = pygame.transform.rotate(sprite_comp.sprite, has_rotated_event.orientation_angle)
+            sprite_comp.sprite = pygame.transform.rotate(sprite_comp.original_sprite, has_rotated_event.orientation_angle)
 
         for _, sprite_comp in self.world.get_component(SpriteComponent):
             self.world.publish(DrawSpriteEvent(sprite_comp.sprite, (sprite_comp.x0, sprite_comp.y0)))

@@ -50,7 +50,7 @@ class PyCombat(World):
         self.add_processor(RectProcessor(), 18)
         self.add_processor(OrientationProcessor(), 17)
         self.add_processor(SpriteProcessor(), 16)
-        self.add_processor(RenderProcessor(), 9)
+        self.add_processor(RenderProcessor(FRAME_RATE), 9)
 
     def is_running(self) -> bool:
         return self._is_running

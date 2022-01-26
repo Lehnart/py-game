@@ -6,18 +6,16 @@ from engine.esper import Processor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.events import DrawRectSpriteEvent, DrawTextEvent, DrawSpriteEvent
 
-FRAME_PER_SECONDS = 60
-
-
 class RenderProcessor(Processor):
 
-    def __init__(self):
+    def __init__(self, frame_per_seconds: float):
         super().__init__()
+        self.frame_per_seconds = frame_per_seconds
         self.last_time_drawn = datetime.datetime.now()
 
     def process(self):
 
-        if datetime.datetime.now() - self.last_time_drawn < datetime.timedelta(seconds=1. / FRAME_PER_SECONDS):
+        if datetime.datetime.now() - self.last_time_drawn < datetime.timedelta(seconds=1. / self.frame_per_seconds ):
             return
         self.last_time_drawn = datetime.datetime.now()
 
