@@ -10,6 +10,7 @@ class InputProcessor(Processor):
 
     def __init__(self):
         super().__init__()
+        self.previously_pressed = {}
 
     def process(self):
 
@@ -18,8 +19,12 @@ class InputProcessor(Processor):
         keys = pygame.key.get_pressed()
         for ent, input_component in input_components:
             for key in input_component.input_dicts:
-                if keys[key]:
+                if input_component.is_repeat and keys[key]:
                     input_component.input_dicts[key](self.world)
+                elif not input_component.is_repeat and keys[key] and not self.previously_pressed[key] :
+                    input_component.input_dicts[key](self.world)
+
+        self.previously_pressed = keys
 
         for event in pygame.event.get():
 

@@ -1,0 +1,10 @@
+import pygame
+
+WINDOW_SIZE = (640, 480)
+FRAME_RATE = 60
+
+SPRITE_SHEET_PATH = "res/sprites.bmp"
+
+PLAYER_X0 = 0
+PLAYER_Y0 = 0
+PLAYER_SPRITE_PARAMETERS = [56, 200, 8, 8, pygame.Color(155, 71, 102)]
