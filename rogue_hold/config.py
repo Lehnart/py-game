@@ -7,4 +7,6 @@ SPRITE_SHEET_PATH = "res/sprites.bmp"
 
 PLAYER_X0 = 0
 PLAYER_Y0 = 0
-PLAYER_SPRITE_PARAMETERS = [56, 200, 8, 8, pygame.Color(155, 71, 102)]
+PLAYER_SPRITE_PARAMETERS = [55, 199, 9, 9, pygame.Color(155, 71, 102)]
+
+GRASS_SPRITE_PARAMETERS = [8, 895, 9, 9, pygame.Color(18, 115, 23)]

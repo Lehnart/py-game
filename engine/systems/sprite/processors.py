@@ -44,4 +44,4 @@ class SpriteProcessor(Processor):
             sprite_comp.sprite = pygame.transform.rotate(sprite_comp.original_sprite, has_rotated_event.orientation_angle)
 
         for _, sprite_comp in self.world.get_component(SpriteComponent):
-            self.world.publish(DrawSpriteEvent(sprite_comp.sprite, (sprite_comp.x0, sprite_comp.y0)))
+            self.world.publish(DrawSpriteEvent(sprite_comp.sprite, (sprite_comp.x0, sprite_comp.y0), sprite_comp.layer))

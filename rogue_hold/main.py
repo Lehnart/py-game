@@ -13,7 +13,8 @@ from engine.systems.render.processors import RenderProcessor
 from engine.systems.speed.events import MoveEvent
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
-from rogue_hold.config import WINDOW_SIZE, FRAME_RATE, PLAYER_SPRITE_PARAMETERS, PLAYER_X0, PLAYER_Y0
+from rogue_hold.config import WINDOW_SIZE, FRAME_RATE, PLAYER_SPRITE_PARAMETERS, PLAYER_X0, PLAYER_Y0, \
+    GRASS_SPRITE_PARAMETERS
 from rogue_hold.sprites import get_sprite
 
 
@@ -29,7 +30,7 @@ class RogueHold(World):
 
         # Player Entity
         player_sprite = get_sprite(*PLAYER_SPRITE_PARAMETERS)
-        player_sprite_component = SpriteComponent(PLAYER_X0, PLAYER_Y0, player_sprite)
+        player_sprite_component = SpriteComponent(PLAYER_X0, PLAYER_Y0, player_sprite, 2)
         player_rect = RectComponent(PLAYER_X0, PLAYER_Y0, player_sprite.get_size()[0], player_sprite.get_size()[1])
         player_rect_limit = RectLimitComponent(0, WINDOW_SIZE[0], 0, WINDOW_SIZE[1])
         player_entity = self.create_entity(player_sprite_component, player_rect, player_rect_limit)
@@ -47,6 +48,16 @@ class RogueHold(World):
                 is_repeat=False
             )
         )
+
+        # Ground
+        grass_sprite = get_sprite(*GRASS_SPRITE_PARAMETERS)
+        gw, gh = grass_sprite.get_size()
+        for x0 in range(0, WINDOW_SIZE[0], gw):
+            for y0 in range(0, WINDOW_SIZE[1], gh):
+                grass_sprite_component = SpriteComponent(x0, y0, grass_sprite)
+                grass_rect = RectComponent(x0, y0, gw, gh)
+                self.create_entity(grass_sprite_component, grass_rect)
+
 
         self.add_processor(InputProcessor(), 20)
         self.add_processor(EventProcessor(), 11)

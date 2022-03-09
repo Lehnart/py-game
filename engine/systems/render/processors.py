@@ -30,7 +30,9 @@ class RenderProcessor(Processor):
             r, c = rect_sprite_event.rect, rect_sprite_event.c
             pygame.draw.rect(window_surface, c, pygame.Rect(r.x, r.y, r.w, r.h))
 
-        for sprite_event in self.world.receive(DrawSpriteEvent):
+        sprite_events = self.world.receive(DrawSpriteEvent)
+        sprite_events.sort(key= lambda e : e.layer)
+        for sprite_event in sprite_events:
             s, p = sprite_event.surf, sprite_event.pos
             window_surface.blit(s, p)
 

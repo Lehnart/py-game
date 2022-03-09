@@ -15,10 +15,11 @@ class DrawRectSpriteEvent(Event):
 
 class DrawSpriteEvent(Event):
 
-    def __init__(self, surf: pygame.Surface, pos: Tuple[int, int]):
+    def __init__(self, surf: pygame.Surface, pos: Tuple[int, int], layer : int):
         super().__init__()
         self.surf = surf
         self.pos = pos
+        self.layer = layer
 
 
 class DrawTextEvent(Event):
