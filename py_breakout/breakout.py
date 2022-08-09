@@ -18,7 +18,7 @@ from engine.systems.render.processors import RenderProcessor
 from engine.systems.sound.components import SoundComponent
 from engine.systems.sound.processors import SoundProcessor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent
+from engine.systems.speed.events import MoveRectEvent
 from engine.systems.speed.processors import SpeedProcessor
 from engine.systems.sprite.processors import SpriteProcessor
 from engine.systems.sprite_rect.components import RectSpriteComponent
@@ -118,8 +118,8 @@ class PyBreakout(World):
             self.paddle,
             InputComponent(
                 {
-                    pygame.K_LEFT: lambda w: w.publish(MoveEvent(self.paddle, -w.process_dt * PADDLE_SPEED, 0.)),
-                    pygame.K_RIGHT: lambda w: w.publish(MoveEvent(self.paddle, +w.process_dt * PADDLE_SPEED, 0.)),
+                    pygame.K_LEFT: lambda w: w.publish(MoveRectEvent(self.paddle, -w.process_dt * PADDLE_SPEED, 0.)),
+                    pygame.K_RIGHT: lambda w: w.publish(MoveRectEvent(self.paddle, +w.process_dt * PADDLE_SPEED, 0.)),
                 }
             )
         )

@@ -3,7 +3,7 @@ import math
 from engine.esper import Event
 
 
-class MoveEvent(Event):
+class MoveRectEvent(Event):
 
     def __init__(self, ent: int, dx: float, dy: float):
         super().__init__()

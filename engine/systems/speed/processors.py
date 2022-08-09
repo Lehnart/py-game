@@ -3,7 +3,7 @@ import math
 
 from engine.esper import Processor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent, SetSpeedSignEvent, SetSpeedOrientationEvent, SetSpeedYEvent, \
+from engine.systems.speed.events import MoveRectEvent, SetSpeedSignEvent, SetSpeedOrientationEvent, SetSpeedYEvent, \
     SetSpeedXEvent
 
 
@@ -78,5 +78,5 @@ class SpeedProcessor(Processor):
         ents = self.world.get_component(SpeedComponent)
         for ent, rect_speed_component in ents:
             self.world.publish(
-                MoveEvent(ent, rect_speed_component.vx * self.world.process_dt, rect_speed_component.vy * self.world.process_dt)
+                MoveRectEvent(ent, rect_speed_component.vx * self.world.process_dt, rect_speed_component.vy * self.world.process_dt)
             )

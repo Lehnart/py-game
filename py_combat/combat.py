@@ -11,7 +11,7 @@ from engine.systems.rect.components import RectComponent
 from engine.systems.rect.processors import RectProcessor
 from engine.systems.render.components import WindowComponent
 from engine.systems.render.processors import RenderProcessor
-from engine.systems.speed.events import MoveEvent
+from engine.systems.speed.events import MoveRectEvent
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
 from py_combat.config import *
@@ -38,8 +38,8 @@ class PyCombat(World):
             tank_left,
             InputComponent(
                 {
-                    pygame.K_UP: lambda w: w.publish(MoveEvent(tank_left, 0, -w.process_dt * TANK_SPEED)),
-                    pygame.K_DOWN: lambda w: w.publish(MoveEvent(tank_left, 0, +w.process_dt * TANK_SPEED)),
+                    pygame.K_UP: lambda w: w.publish(MoveRectEvent(tank_left, 0, -w.process_dt * TANK_SPEED)),
+                    pygame.K_DOWN: lambda w: w.publish(MoveRectEvent(tank_left, 0, +w.process_dt * TANK_SPEED)),
                     pygame.K_LEFT: lambda w: w.publish(RotateEvent(tank_left, -w.process_dt * TANK_ROTATION_SPEED)),
                     pygame.K_RIGHT: lambda w: w.publish(RotateEvent(tank_left, +w.process_dt * TANK_ROTATION_SPEED)),
                 }

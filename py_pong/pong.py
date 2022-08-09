@@ -16,7 +16,7 @@ from engine.systems.render.processors import RenderProcessor
 from engine.systems.sound.components import SoundComponent
 from engine.systems.sound.processors import SoundProcessor
 from engine.systems.speed.components import SpeedComponent
-from engine.systems.speed.events import MoveEvent
+from engine.systems.speed.events import MoveRectEvent
 from engine.systems.speed.processors import SpeedProcessor
 from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
@@ -51,8 +51,8 @@ class PyPong(World):
             paddle1,
             InputComponent(
                 {
-                    pygame.K_UP: lambda w: w.publish(MoveEvent(paddle1, 0, -w.process_dt * PADDLE_SPEED)),
-                    pygame.K_DOWN: lambda w: w.publish(MoveEvent(paddle1, 0, +w.process_dt * PADDLE_SPEED)),
+                    pygame.K_UP: lambda w: w.publish(MoveRectEvent(paddle1, 0, -w.process_dt * PADDLE_SPEED)),
+                    pygame.K_DOWN: lambda w: w.publish(MoveRectEvent(paddle1, 0, +w.process_dt * PADDLE_SPEED)),
                 }
             )
         )
@@ -69,8 +69,8 @@ class PyPong(World):
             paddle2,
             InputComponent(
                 {
-                    pygame.K_i: lambda w: w.publish(MoveEvent(paddle2, 0, -w.process_dt * PADDLE_SPEED)),
-                    pygame.K_k: lambda w: w.publish(MoveEvent(paddle2, 0, +w.process_dt * PADDLE_SPEED)),
+                    pygame.K_i: lambda w: w.publish(MoveRectEvent(paddle2, 0, -w.process_dt * PADDLE_SPEED)),
+                    pygame.K_k: lambda w: w.publish(MoveRectEvent(paddle2, 0, +w.process_dt * PADDLE_SPEED)),
                 }
             )
         )

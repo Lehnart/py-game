@@ -4,7 +4,7 @@ from engine.esper import Processor
 from engine.systems.limit_rect.events import OutOfLimitEvent
 from engine.systems.rect.components import RectComponent
 from engine.systems.rect.events import HasMovedEvent, SetPositionEvent
-from engine.systems.speed.events import MoveEvent
+from engine.systems.speed.events import MoveRectEvent
 
 
 class RectProcessor(Processor):
@@ -23,7 +23,7 @@ class RectProcessor(Processor):
             r.x = set_pos_event.x
             r.y = set_pos_event.y
 
-        move_events = self.world.receive(MoveEvent)
+        move_events = self.world.receive(MoveRectEvent)
         for move_event in move_events:
             if not self.world.entity_exists(move_event.ent):
                 continue

@@ -20,9 +20,9 @@ class InputProcessor(Processor):
         for ent, input_component in input_components:
             for key in input_component.input_dicts:
                 if input_component.is_repeat and keys[key]:
-                    input_component.input_dicts[key](self.world)
-                elif not input_component.is_repeat and keys[key] and not self.previously_pressed[key] :
-                    input_component.input_dicts[key](self.world)
+                    input_component.input_dicts[key](self.world, ent)
+                elif not input_component.is_repeat and keys[key] and not self.previously_pressed[key]:
+                    input_component.input_dicts[key](self.world, ent)
 
         self.previously_pressed = keys
 
