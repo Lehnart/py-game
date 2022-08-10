@@ -1,5 +1,5 @@
 from engine.esper import Processor
-from engine.systems.sprite_text.events import SetTextEvent
+from engine.systems.sprite_string.events import SetStringEvent
 from py_pong.systems.score.components import ScoreComponent
 from py_pong.systems.score.events import IncrementScoreEvent
 
@@ -21,4 +21,4 @@ class ScoreProcessor(Processor):
             score_comp = self.world.component_for_entity(event.ent, ScoreComponent)
             score_comp.score += 1
 
-            self.world.publish(SetTextEvent(event.ent, str(score_comp.score)))
+            self.world.publish(SetStringEvent(event.ent, str(score_comp.score)))

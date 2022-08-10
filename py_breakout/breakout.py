@@ -23,8 +23,8 @@ from engine.systems.speed.processors import SpeedProcessor
 from engine.systems.sprite.processors import SpriteProcessor
 from engine.systems.sprite_rect.components import RectSpriteComponent
 from engine.systems.sprite_rect.processors import RectSpriteProcessor
-from engine.systems.sprite_text.components import TextSpriteComponent
-from engine.systems.sprite_text.processors import TextSpriteProcessor
+from engine.systems.sprite_string.components import StringSpriteComponent
+from engine.systems.sprite_string.processors import StringSpriteProcessor
 from py_breakout.callbacks import BounceWallCallback, BounceRectCallback
 from py_breakout.config import *
 from py_breakout.systems.life.components import LifeComponent
@@ -62,7 +62,7 @@ class PyBreakout(World):
         self.add_processor(RectProcessor(), 18)
         self.add_processor(RectSpriteProcessor(), 17)
         self.add_processor(SpriteProcessor(), 16)
-        self.add_processor(TextSpriteProcessor(), 15)
+        self.add_processor(StringSpriteProcessor(), 15)
         self.add_processor(LimitRectProcessor(), 13)
         self.add_processor(CollisionRectProcessor(), 12)
         self.add_processor(EventProcessor(), 11)
@@ -125,12 +125,12 @@ class PyBreakout(World):
         )
 
         # score
-        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
+        left_score_text = StringSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
         score_comp = ScoreComponent(0)
         self.score = self.create_entity(left_score_text, score_comp)
 
         # lives
-        lives_text = TextSpriteComponent("3", SCORE_FONT, pygame.Color("white"), LIVE_POS)
+        lives_text = StringSpriteComponent("3", SCORE_FONT, pygame.Color("white"), LIVE_POS)
         life = LifeComponent(3)
         self.lives = self.create_entity(lives_text, life)
 

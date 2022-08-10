@@ -3,7 +3,7 @@ from typing import Tuple
 import pygame.font
 
 
-class TextSpriteComponent:
+class StringSpriteComponent:
 
     def __init__(self, string: str, ft: pygame.font.Font, color: pygame.Color, pos: Tuple[int, int]):
         self.string = string

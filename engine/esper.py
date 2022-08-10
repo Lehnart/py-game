@@ -11,6 +11,8 @@ from typing import Tuple as _Tuple
 from typing import Type as _Type
 from typing import TypeVar as _TypeVar
 
+import pygame
+
 version = '1.5'
 
 _C = _TypeVar('_C')

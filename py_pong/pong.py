@@ -22,8 +22,8 @@ from engine.systems.sprite.components import SpriteComponent
 from engine.systems.sprite.processors import SpriteProcessor
 from engine.systems.sprite_rect.components import RectSpriteComponent
 from engine.systems.sprite_rect.processors import RectSpriteProcessor
-from engine.systems.sprite_text.components import TextSpriteComponent
-from engine.systems.sprite_text.processors import TextSpriteProcessor
+from engine.systems.sprite_string.components import StringSpriteComponent
+from engine.systems.sprite_string.processors import StringSpriteProcessor
 from py_pong.callbacks import BounceWallCallback, bounce_paddle
 from py_pong.config import *
 from py_pong.systems.score.components import ScoreComponent
@@ -79,13 +79,13 @@ class PyPong(World):
         self.create_entity(SpriteComponent(400,0,CENTER_LINE_SPRITE))
 
         # left score
-        left_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
+        left_score_text = StringSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_LEFT_POS)
         left_score_comp = ScoreComponent(0)
         sound_comp = SoundComponent(LOSE_SOUND)
         left_score = self.create_entity(left_score_text, left_score_comp, sound_comp)
 
         # right score
-        right_score_text = TextSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_RIGHT_POS)
+        right_score_text = StringSpriteComponent("0", SCORE_FONT, pygame.Color("white"), SCORE_RIGHT_POS)
         right_score_comp = ScoreComponent(0)
         sound_comp = SoundComponent(LOSE_SOUND)
         right_score = self.create_entity(right_score_text, right_score_comp, sound_comp)
@@ -113,7 +113,7 @@ class PyPong(World):
         self.add_processor(RectProcessor(), 18)
         self.add_processor(RectSpriteProcessor(), 17)
         self.add_processor(SpriteProcessor(), 16)
-        self.add_processor(TextSpriteProcessor(), 15)
+        self.add_processor(StringSpriteProcessor(), 15)
         self.add_processor(LimitRectProcessor(), 13)
         self.add_processor(CollisionRectProcessor(), 12)
         self.add_processor(EventProcessor(), 11)
