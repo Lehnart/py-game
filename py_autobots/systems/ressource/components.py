@@ -3,7 +3,8 @@ from enum import Enum
 
 class Ressource(Enum):
     WOOD = 1,
-    STONE = 2,
+    BRANCH = 2,
+    STONE = 3,
 
 
 class RessourceComponent:

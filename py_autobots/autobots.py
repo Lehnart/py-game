@@ -19,13 +19,15 @@ from py_autobots.config import WINDOW_SIZE, FRAME_RATE, HERO_RECT, HERO_SPRITE, 
 from py_autobots.systems.holder.components import HolderComponent
 from py_autobots.systems.holder.events import TakeEvent, DropEvent
 from py_autobots.systems.holder.processors import HolderProcessor
-from py_autobots.systems.plan.events import CreatePlanEvent
+from py_autobots.systems.plan.components import PlanComponent
+from py_autobots.systems.plan.events import CreatePlanEvent, AddRessourceEvent, BuildEvent
 from py_autobots.systems.plan.processors import PlanProcessor
 from py_autobots.systems.plan_menu.components import PlanMenuComponent
 from py_autobots.systems.plan_menu.events import NextPlanEvent, PreviousPlanEvent
 from py_autobots.systems.plan_menu.processors import PlanMenuProcessor
 from py_autobots.systems.plan_menu_item.components import PlanMenuItemComponent
 from py_autobots.systems.plan_menu_item.processors import PlanMenuItemProcessor
+from py_autobots.systems.ressource.components import RessourceComponent, Ressource
 
 
 def create_plan(w: World, e: int):
@@ -39,6 +41,12 @@ def create_plan(w: World, e: int):
     if plan_name:
         w.publish(CreatePlanEvent(plan_name, r.x, r.y))
 
+def build_plan(w: World, e: int):
+    r = w.component_for_entity(e, RectComponent)
+    l = w.get_components(RectComponent, PlanComponent)
+    for e, [c,_] in l:
+        if c.x == r.x and c.y == r.y:
+            w.publish(BuildEvent(e))
 
 def take_item(w: World, holder_ent: int):
     r = w.component_for_entity(holder_ent, RectComponent)
@@ -51,6 +59,21 @@ def take_item(w: World, holder_ent: int):
 
     if taken_ent:
         w.publish(TakeEvent(holder_ent, taken_ent))
+
+
+def drop_item(w: World, holder_ent: int):
+
+    hold_comp : HolderComponent = w.component_for_entity(holder_ent, HolderComponent)
+    if hold_comp.hold_ent and w.has_component(hold_comp.hold_ent, RessourceComponent):
+        r = w.component_for_entity(holder_ent, RectComponent)
+        l = w.get_components(RectComponent, PlanComponent)
+        for e, [c, _] in l:
+            if c.x == r.x and c.y == r.y :
+                w.publish(AddRessourceEvent(e, hold_comp.hold_ent))
+                return
+
+    w.publish(DropEvent(holder_ent))
+
 
 class PyAutobots(World):
 
@@ -76,9 +99,10 @@ class PyAutobots(World):
                     pygame.K_s: lambda w, e: w.publish(MoveRectEvent(e, 0, TILE_SIZE)),
                     pygame.K_q: lambda w, e: w.publish(MoveRectEvent(e, -TILE_SIZE, 0)),
                     pygame.K_d: lambda w, e: w.publish(MoveRectEvent(e, TILE_SIZE, 0)),
-                    pygame.K_g: lambda w, e: w.publish(DropEvent(e)),
+                    pygame.K_g: drop_item,
                     pygame.K_e: create_plan,
-                    pygame.K_t: take_item
+                    pygame.K_t: take_item,
+                    pygame.K_b: build_plan
                 },
                 is_repeat=False
             )
@@ -130,14 +154,19 @@ class PyAutobots(World):
 
                 rect = RectComponent(x, y, TILE_SIZE, TILE_SIZE)
                 sprite = None
+                res = None
                 if random.random() < 10. / 625.:
                     sprite = SpriteComponent(x, y, TREE_SPRITE)
                 elif random.random() < 10. / 625.:
                     sprite = SpriteComponent(x, y, BRANCH_SPRITE)
+                    res = RessourceComponent(Ressource.BRANCH)
                 elif random.random() < 10. / 625.:
                     sprite = SpriteComponent(x, y, ROCK_SPRITE)
+                    res = RessourceComponent(Ressource.STONE)
 
                 ent = self.create_entity(rect, sprite, 1)
+                if res :
+                    self.add_component(ent, res)
 
         self.add_processor(InputProcessor(), 20)
         self.add_processor(PlanMenuProcessor(), 19)
