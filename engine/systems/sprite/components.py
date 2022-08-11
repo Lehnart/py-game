@@ -9,3 +9,4 @@ class SpriteComponent:
         self.sprite = sprite
         self.original_sprite = sprite
         self.layer = layer
+        self.is_visible = True

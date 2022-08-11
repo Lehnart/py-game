@@ -16,6 +16,9 @@ from engine.systems.sprite_string.components import StringSpriteComponent
 from engine.systems.sprite_string.processors import StringSpriteProcessor
 from py_autobots.config import WINDOW_SIZE, FRAME_RATE, HERO_RECT, HERO_SPRITE, TILE_SIZE, GRASS_SPRITE, TREE_SPRITE, \
     BRANCH_SPRITE, ROCK_SPRITE, WORKSHOP_RECT, WORKSHOP_SPRITE, TILE_COUNT, MENU_FONT
+from py_autobots.systems.holder.components import HolderComponent
+from py_autobots.systems.holder.events import TakeEvent, DropEvent
+from py_autobots.systems.holder.processors import HolderProcessor
 from py_autobots.systems.plan.events import CreatePlanEvent
 from py_autobots.systems.plan.processors import PlanProcessor
 from py_autobots.systems.plan_menu.components import PlanMenuComponent
@@ -37,6 +40,18 @@ def create_plan(w: World, e: int):
         w.publish(CreatePlanEvent(plan_name, r.x, r.y))
 
 
+def take_item(w: World, holder_ent: int):
+    r = w.component_for_entity(holder_ent, RectComponent)
+    l = w.get_component(RectComponent)
+
+    taken_ent = None
+    for e, c in l:
+        if c.x == r.x and c.y == r.y:
+            taken_ent = e
+
+    if taken_ent:
+        w.publish(TakeEvent(holder_ent, taken_ent))
+
 class PyAutobots(World):
 
     def __init__(self):
@@ -50,7 +65,8 @@ class PyAutobots(World):
         # hero entity
         rect = RectComponent(*HERO_RECT)
         sprite = SpriteComponent(HERO_RECT[0], HERO_RECT[1], HERO_SPRITE, 1)
-        hero = self.create_entity(rect, sprite)
+        holder = HolderComponent()
+        hero = self.create_entity(rect, sprite, holder)
 
         self.add_component(
             hero,
@@ -60,7 +76,9 @@ class PyAutobots(World):
                     pygame.K_s: lambda w, e: w.publish(MoveRectEvent(e, 0, TILE_SIZE)),
                     pygame.K_q: lambda w, e: w.publish(MoveRectEvent(e, -TILE_SIZE, 0)),
                     pygame.K_d: lambda w, e: w.publish(MoveRectEvent(e, TILE_SIZE, 0)),
-                    pygame.K_e: create_plan
+                    pygame.K_g: lambda w, e: w.publish(DropEvent(e)),
+                    pygame.K_e: create_plan,
+                    pygame.K_t: take_item
                 },
                 is_repeat=False
             )
@@ -128,6 +146,7 @@ class PyAutobots(World):
         self.add_processor(StringSpriteProcessor(), 17)
         self.add_processor(SpriteProcessor(), 16)
         self.add_processor(RectProcessor(), 16)
+        self.add_processor(HolderProcessor(), 15)
         self.add_processor(RenderProcessor(FRAME_RATE), 9)
 
     def is_running(self) -> bool:
