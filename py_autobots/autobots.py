@@ -16,7 +16,7 @@ from engine.systems.sprite_string.components import StringSpriteComponent
 from engine.systems.sprite_string.processors import StringSpriteProcessor
 from py_autobots.config import WINDOW_SIZE, FRAME_RATE, HERO_RECT, HERO_SPRITE, TILE_SIZE, GRASS_SPRITE, TREE_SPRITE, \
     BRANCH_SPRITE, ROCK_SPRITE, WORKSHOP_RECT, WORKSHOP_SPRITE, TILE_COUNT, MENU_FONT
-from py_autobots.systems.holder.components import HolderComponent
+from py_autobots.systems.holder.components import HolderComponent, PickableComponent
 from py_autobots.systems.holder.events import TakeEvent, DropEvent
 from py_autobots.systems.holder.processors import HolderProcessor
 from py_autobots.systems.plan.components import PlanComponent
@@ -41,19 +41,21 @@ def create_plan(w: World, e: int):
     if plan_name:
         w.publish(CreatePlanEvent(plan_name, r.x, r.y))
 
+
 def build_plan(w: World, e: int):
     r = w.component_for_entity(e, RectComponent)
     l = w.get_components(RectComponent, PlanComponent)
-    for e, [c,_] in l:
+    for e, [c, _] in l:
         if c.x == r.x and c.y == r.y:
             w.publish(BuildEvent(e))
 
+
 def take_item(w: World, holder_ent: int):
     r = w.component_for_entity(holder_ent, RectComponent)
-    l = w.get_component(RectComponent)
+    l = w.get_components(RectComponent, PickableComponent)
 
     taken_ent = None
-    for e, c in l:
+    for e, [c,_] in l:
         if c.x == r.x and c.y == r.y:
             taken_ent = e
 
@@ -62,14 +64,13 @@ def take_item(w: World, holder_ent: int):
 
 
 def drop_item(w: World, holder_ent: int):
-
-    hold_comp : HolderComponent = w.component_for_entity(holder_ent, HolderComponent)
+    hold_comp: HolderComponent = w.component_for_entity(holder_ent, HolderComponent)
     if hold_comp.hold_ent and w.has_component(hold_comp.hold_ent, RessourceComponent):
         r = w.component_for_entity(holder_ent, RectComponent)
         l = w.get_components(RectComponent, PlanComponent)
         for e, [c, _] in l:
-            if c.x == r.x and c.y == r.y :
-                w.publish(AddRessourceEvent(e, hold_comp.hold_ent))
+            if c.x == r.x and c.y == r.y:
+                w.publish(AddRessourceEvent(e, hold_comp.hold_ent, holder_ent))
                 return
 
     w.publish(DropEvent(holder_ent))
@@ -155,19 +156,22 @@ class PyAutobots(World):
                 rect = RectComponent(x, y, TILE_SIZE, TILE_SIZE)
                 sprite = None
                 res = None
+                pick = None
                 if random.random() < 10. / 625.:
                     sprite = SpriteComponent(x, y, TREE_SPRITE)
                 elif random.random() < 10. / 625.:
                     sprite = SpriteComponent(x, y, BRANCH_SPRITE)
                     res = RessourceComponent(Ressource.BRANCH)
+                    pick = PickableComponent()
                 elif random.random() < 10. / 625.:
                     sprite = SpriteComponent(x, y, ROCK_SPRITE)
                     res = RessourceComponent(Ressource.STONE)
-
+                    pick = PickableComponent()
                 ent = self.create_entity(rect, sprite, 1)
-                if res :
+                if res:
                     self.add_component(ent, res)
-
+                if pick:
+                    self.add_component(ent, pick)
         self.add_processor(InputProcessor(), 20)
         self.add_processor(PlanMenuProcessor(), 19)
         self.add_processor(PlanMenuItemProcessor(), 19)

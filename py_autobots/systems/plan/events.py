@@ -13,10 +13,11 @@ class CreatePlanEvent(Event):
 
 class AddRessourceEvent(Event):
 
-    def __init__(self, dest_plan_ent: int, res_ent: int):
+    def __init__(self, dest_plan_ent: int, res_ent: int, holder_ent : int):
         super().__init__()
         self.dest_plan_ent = dest_plan_ent
         self.res_ent = res_ent
+        self.holder_ent = holder_ent
 
 class BuildEvent(Event):
 

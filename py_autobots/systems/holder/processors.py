@@ -3,7 +3,7 @@ from engine.systems.rect.components import RectComponent
 from engine.systems.speed.events import MoveRectEvent
 from engine.systems.sprite.events import FlipVisibilityEvent
 from py_autobots.systems.holder.components import HolderComponent
-from py_autobots.systems.holder.events import TakeEvent, DropEvent
+from py_autobots.systems.holder.events import TakeEvent, DropEvent, RemoveEvent
 
 
 class HolderProcessor(Processor):
@@ -52,3 +52,15 @@ class HolderProcessor(Processor):
             if self.world.has_component(drop_ent, RectComponent):
                 drop_rect_component = self.world.component_for_entity(drop_ent, RectComponent)
                 self.world.publish(MoveRectEvent(drop_ent, rect_component.x - drop_rect_component.x, rect_component.y - drop_rect_component.y))
+
+
+        for event in self.world.receive(RemoveEvent):
+
+            if not self.world.entity_exists(event.holder_ent):
+                continue
+
+            if not self.world.has_components(event.holder_ent, HolderComponent, RectComponent):
+                continue
+
+            holder_component = self.world.component_for_entity(event.holder_ent, HolderComponent)
+            holder_component.hold_ent = None

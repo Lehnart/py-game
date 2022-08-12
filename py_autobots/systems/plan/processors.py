@@ -4,6 +4,7 @@ from engine.esper import Processor
 from engine.systems.rect.components import RectComponent
 from engine.systems.sprite.components import SpriteComponent
 from py_autobots.config import WORKSHOP_SPRITE, TILE_SIZE
+from py_autobots.systems.holder.events import RemoveEvent
 from py_autobots.systems.plan.components import PlanComponent
 from py_autobots.systems.plan.events import CreatePlanEvent, AddRessourceEvent, BuildEvent
 from py_autobots.systems.ressource.components import Ressource, RessourceComponent
@@ -25,15 +26,16 @@ class PlanProcessor(Processor):
             plan = self.world.create_entity(
                 PlanComponent({Ressource.BRANCH: 1}),
                 SpriteComponent(event.x, event.y, sprite, 1),
-                RectComponent(event.x,event.y,TILE_SIZE,TILE_SIZE)
+                RectComponent(event.x, event.y, TILE_SIZE, TILE_SIZE)
             )
             print("plan " + str(plan))
 
         for event in self.world.receive(AddRessourceEvent):
 
-            event : AddRessourceEvent
+            event: AddRessourceEvent
             res_ent = event.res_ent
             dest_plan_ent = event.dest_plan_ent
+            holder_ent = event.holder_ent
 
             if not self.world.entity_exists(dest_plan_ent):
                 continue
@@ -47,10 +49,10 @@ class PlanProcessor(Processor):
             if not self.world.has_component(dest_plan_ent, PlanComponent):
                 continue
 
-            res_comp  : RessourceComponent = self.world.component_for_entity(res_ent, RessourceComponent)
-            plan_comp : PlanComponent = self.world.component_for_entity(dest_plan_ent, PlanComponent)
+            res_comp: RessourceComponent = self.world.component_for_entity(res_ent, RessourceComponent)
+            plan_comp: PlanComponent = self.world.component_for_entity(dest_plan_ent, PlanComponent)
 
-            if not res_comp.res in plan_comp.required_ressources :
+            if res_comp.res not in plan_comp.required_ressources:
                 continue
 
             if plan_comp.required_ressources[res_comp.res] == plan_comp.current_ressources[res_comp.res]:
@@ -60,9 +62,12 @@ class PlanProcessor(Processor):
             print(res_comp.res)
             print(plan_comp.current_ressources[res_comp.res])
 
+            self.world.delete_entity(res_ent, True)
+            self.world.publish(RemoveEvent(holder_ent))
+
         for event in self.world.receive(BuildEvent):
 
-            event : BuildEvent
+            event: BuildEvent
             dest_plan_ent = event.dest_plan_ent
 
             if not self.world.entity_exists(dest_plan_ent):
@@ -70,9 +75,9 @@ class PlanProcessor(Processor):
             if not self.world.has_component(dest_plan_ent, PlanComponent):
                 continue
 
-            plan_comp : PlanComponent = self.world.component_for_entity(dest_plan_ent, PlanComponent)
+            plan_comp: PlanComponent = self.world.component_for_entity(dest_plan_ent, PlanComponent)
 
-            if plan_comp.required_ressources != plan_comp.current_ressources :
+            if plan_comp.required_ressources != plan_comp.current_ressources:
                 continue
 
             self.world.remove_component(dest_plan_ent, PlanComponent)

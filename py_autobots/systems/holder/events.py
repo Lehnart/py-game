@@ -14,3 +14,11 @@ class DropEvent(Event):
     def __init__(self, holder_ent: int):
         super().__init__()
         self.holder_ent = holder_ent
+
+
+
+class RemoveEvent(Event):
+
+    def __init__(self, holder_ent: int):
+        super().__init__()
+        self.holder_ent = holder_ent
